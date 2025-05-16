@@ -1,0 +1,16 @@
+﻿@model HrManagementSystem.Models.Projects
+
+<h2>Edit Project</h2>
+
+<form asp-action="EditProject" method="post">
+    <input type="hidden" asp-for="ProjectId" />
+    <div class="form-group">
+        <label>Project Name</label>
+        <input asp-for="ProjectName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Description</label>
+        <input asp-for="Description" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Update</button>
+</form>

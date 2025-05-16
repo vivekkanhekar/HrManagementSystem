@@ -1,0 +1,65 @@
+﻿@model PaginationList<User>
+
+
+@{
+    ViewData["Title"] = " ViewManager";
+}
+
+
+<form asp-action="ViewManager
+" asp-asp-controller="SuperAdmin" method="get">
+                @if (@Model != null)
+                {
+
+                    <table class="table table-active w-75" align="center">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Password</th>
+                                
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var C in Model)
+                            {
+                                <tr>
+
+                                    <td>@C.UserName</td>
+                                    <td>@C.Email</td>
+                                    <td>@C.Password.ToString()</td>
+                                    
+
+                                    <td>
+                                        <a asp-action="DeleteAdmin" class="button" asp-route-id="@C.Id">Delete</a>
+                                    </td>
+                                    <td>
+                                        <a asp-action="EditAdmin" asp-route-id="@C.Id">Edit</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="text-danger">No data available.!</div>
+                }
+            </form>
+
+        
+@{
+    var prevDisable = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisable = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="ViewAdmin" asp-route-pageNumber="@(Model.PageIndex-1)" class="btn btn-default @prevDisable">
+
+    Previous
+</a>
+
+<a asp-action="ViewAdmin" asp-route-pageNumber="@(Model.PageIndex+1)" class="btn btn-default @nextDisable">
+
+    Next
+</a>

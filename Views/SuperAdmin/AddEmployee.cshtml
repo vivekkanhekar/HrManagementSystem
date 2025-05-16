@@ -1,0 +1,83 @@
+﻿@model AddEmployeeViewModel
+
+@{
+    ViewData["Title"] = "Assign Employee";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+<h2>Add Employee</h2>
+
+<form asp-action="AddEmployee" asp-asp-controller="SuperAdmin" method="post">
+    <div class="tableContent" align="center">
+        <div class="form-group">
+            <table>
+                <tr>
+                    <td>
+
+                        <label>First Name</label>
+                        <input asp-for="FirstName" class="form-control" />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+
+
+                        <label>Last Name</label>
+                        <input asp-for="LastName" class="form-control" />
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Email</label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label>Department</label>
+                        <select id="Department" required name="Department" asp-items="ViewBag.Departments" action="Post" class="dropdown">
+                            <option value="">Select Department</option>
+                        </select>
+                        <span asp-validation-for="Department" class="text-danger"></span>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        <label>Phone</label>
+                        <input asp-for="Phone" class="form-control" />
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <td>
+                        <label>Address</label>
+                        <textarea asp-for="Address" ></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button type="submit" class="btn btn-primary">Add Employee</button>
+                    </td>
+                </tr>
+
+
+
+            </table>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

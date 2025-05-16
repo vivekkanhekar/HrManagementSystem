@@ -1,0 +1,47 @@
+﻿@model HrManagementSystem.Models.ActivityTasks
+@{
+    ViewBag.Title = "Edit Activity";
+}
+
+<h2>Edit Activity</h2>
+
+<form asp-action="EditActivity" method="post">
+    <input type="hidden" asp-for="ActivityId" />
+    <div class="tableContent" align="center">
+        <div class="form-group">
+            <table>
+                <tr>
+                    <td>
+                        <label>Activity Name</label>
+                        <input asp-for="ActivityName" class="form-control" />
+                    </td>
+
+                </tr>
+                <tr>
+                    <td>
+                        <label>Description</label>
+                        <input asp-for="Description" class="form-control" />
+
+                    </td>
+
+                </tr>
+                <tr>
+                    <td>
+                        <label>Project</label>
+                        <select id="ProjectId" required name="ProjectId" asp-items="ViewBag.Project" action="Post" class="dropdown">
+                            <option value="">Select Project</option>
+                        </select>
+                    </td>
+
+                    @*  <span asp-validation-for="Department" class="text-danger"></span>
+        <select asp-for="ProjectId" asp-items="ViewBag.Projects" class="form-control"></select> *@
+                </tr>
+                <tr>
+                    <td>
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</form>

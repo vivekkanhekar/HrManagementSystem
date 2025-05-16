@@ -1,0 +1,57 @@
+﻿@model User
+<h1>Add Client</h1>
+<form asp-action="AddClient" asp-controller="SuperAdmin" method="post">
+    <div class="tableContent" align="center">
+        <div class="form-group">
+            <table cellpadding="8" cellspacing="5">
+                <tr>
+                    <td>
+                        <label>Client Name:</label>
+                        <input type="text" asp-for="UserName" required />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>FirstName:</label>
+                        <input type="FirstName" asp-for="FirstName" required />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>LastName:</label>
+                        <input type="LastName" asp-for="LastName" required />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>PhoneNumber:</label>
+                        <input type="PhoneNumber" asp-for="PhoneNumber" required />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Address:</label>
+                        <input type="Address" asp-for="Address" required />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Email:</label>
+                        <input type="email" asp-for="Email" required />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button type="submit" class="btn btn-primary mt-2">Add Client</button>
+                    </td>
+                </tr>
+            </table>
+
+
+        </div>
+    </div>
+
+
+
+
+</form>

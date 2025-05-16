@@ -1,0 +1,49 @@
+﻿<div class="row">
+    <div class="TableContent" align="center">
+        <div class="col-md-4 w-75 d-grid bg-gradient">
+            <form asp-action="RoleList" asp-asp-controller="Manager" method="get">
+                @if (@Model != null)
+                {
+                    <table class="table carousel-item-start">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Name</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var C in Model)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @C.Id
+
+                                    </td>
+                                    <td>
+                                        @C.Name
+                                    </td>
+
+
+                                    <td>
+                                        <a asp-action="DeleteRole" asp-route-id="@C.Id">Delete</a>
+                                    </td>
+                                    <td>
+                                        <a asp-action="EditRole" asp-route-id="@C.Id">Edit</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+
+                else
+                {
+                    <div class="text-danger">No data available.!</div>
+                }
+            </form>
+
+        </div>
+    </div>
+</div>

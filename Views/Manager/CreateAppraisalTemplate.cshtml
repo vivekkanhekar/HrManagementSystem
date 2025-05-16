@@ -1,0 +1,92 @@
+﻿@model AppTemplateLatest
+
+@{
+    ViewData["Title"] = "Create Appraisal Template";
+}
+
+<h2>Create Appraisal Template</h2>
+
+<form asp-action="CreateAppraisalTemplate" method="post">
+    <table class="table table-borderless w-100" style="max-width: 600px; margin: auto;" >
+        <tr>
+            <td>
+                <div class="form-group">
+                    <label>Department </label>
+                    <select id="DepartmentId" required name="DepartmentId" asp-for="DepartmentId" asp-items="ViewBag.Department" action="Post" class="dropdown">
+                        <option value="">Select Department</option>
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+                    <label>Client </label>
+                    <select id="ClientId" required name="ClientId" asp-for="ClientId" asp-items="ViewBag.Client" action="Post" class="dropdown">
+                        <option value="">Select Client</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Activity </label>
+                    <select id="ActivityId" required name="ActivityId" asp-for="ActivityId" asp-items="ViewBag.Activity" action="Post" class="dropdown">
+                        <option value="">Select Activity</option>
+                    </select>
+                </div>
+
+                @* <div class="form-group">
+        <label>Manager </label>
+        <select id="ActivityId" required name="ActivityId" asp-for="ActivityId" asp-items="ViewBag.Activity" action="Post" class="dropdown">
+            <option value="">Select Activity</option>
+        </select>
+    </div> *@
+                @*   <div class="form-group">
+        <label for="File Name">File Name</label>
+        <input type="file" name="fileName" asp-for="FileName" id="fileName" multiple="multiple" accept=".xls,.xlsx" />
+    </div>
+
+      <div class="form-group">
+        <label for="File Path">File Path</label>
+        <input type="file" name="filePath" asp-for="FilePath" id="filePath" multiple="multiple" accept=".xls,.xlsx" />
+    </div> no need *@
+
+                @* @for (int i = 0; i < 5; i++)
+    {
+        <div class="form-group">
+            <label for="MeasuringKeys_@i">Measuring Key @(@i + 1)</label>
+            <input type="text" id="MeasuringKeys_@i" name="MeasuringKeys[@i]" class="form-control" required />
+        </div>
+    }
+
+ *@
+
+                <div class="form-group">
+                    <label for="Measuring Keys">Measuring Keys</label>
+                    <input type="text" id="MeasuringKeys" name="MeasuringKeys" asp-for="MeasuringKeys[0]" class="form-control" required />
+                </div>
+
+
+                <div class="form-group">
+                    <label for="Measuring Keys">Measuring Keys</label>
+                    <input type="text" id="Measuring Keys" name="MeasuringKeys" asp-for="MeasuringKeys[1]" class="form-control" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="Measuring Keys">Measuring Keys</label>
+                    <input type="text" id="Measuring Keys" name="MeasuringKeys" asp-for="MeasuringKeys[2]" class="form-control" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="Measuring Keys">Measuring Keys</label>
+                    <input type="text" id="Measuring Keys" name="MeasuringKeys" asp-for="MeasuringKeys[3]" class="form-control" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="Measuring Keys">Measuring Keys</label>
+                    <input type="text" id="Measuring Keys" name="MeasuringKeys" asp-for="MeasuringKeys[4]" class="form-control" required />
+                </div>
+
+                <button type="submit" class="btn btn-success">Create Template</button>
+            </td>
+        </tr>
+    </table>
+   
+</form>

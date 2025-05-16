@@ -1,0 +1,26 @@
+﻿@model IEnumerable<HrManagementSystem.Models.Projects>
+
+<h2>Projects</h2>
+@* <a href="/SuperAdmin/CreateProject" class="btn btn-primary">Add New Project</a>
+ *@<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Project Name</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ProjectName</td>
+                <td>@item.Description</td>
+                <td>
+                    <a href="/SuperAdmin/EditProject/@item.ProjectId" class="btn btn-warning">Edit</a>
+                    <a href="/SuperAdmin/DeleteProject/@item.ProjectId" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,29 @@
+﻿@model HrManagementSystem.Models.Projects
+
+@* <h2>Add New Project</h2> *@
+
+<form asp-action="AddProject" method="post">
+    <div class="tableContent" align="center">
+        <div class="form-group">
+            <table>
+                <tr>
+                    <td>
+                        <label>Project Name</label>
+                        <input asp-for="ProjectName" class="form-control" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Description</label>
+                        <input asp-for="Description" class="form-control" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button type="submit" class="btn btn-success">Save</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</form>

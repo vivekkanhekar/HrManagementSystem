@@ -1,0 +1,88 @@
+﻿
+
+ @model WeeklyTimesheetViewModel
+
+<form asp-action="CreateTimesheet" asp-controller="Employee" method="post">
+    <table id="timesheetTable" class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Client</th>
+                <th>Activity</th>
+                <th>Project</th>
+                <th>Hours Worked</th>
+                <th>Description</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="timesheetBody"></tbody>
+    </table>
+@*     <button type="button" class="btn btn-link" onclick="addNewRow()">Add New Row</button>
+ *@  
+ <button type="button" onclick="addNewRow()">Add New Row</button>
+
+ <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+<style>
+
+    .form-control{
+        width:50%;
+        background-color:aquamarine;
+    }
+</style>
+<script src="~/js/jquery-3.6.0.min.js"></script>
+
+<script>
+      // $(document).ready(function () {  
+    var rowIndex = 0;
+    alert(rowIndex);
+    var clients = @Html.Raw(Json.Serialize(Model.Clients));
+    var projects = @Html.Raw(Json.Serialize(Model.Projects));
+    var activities = @Html.Raw(Json.Serialize(Model.ActivityTasks));
+     //alert(clients);
+
+
+    function createSelect(namePrefix, list) {
+        var html = `<select name="${namePrefix}" class="form-control"  required>`;
+        for (const item of list) {
+            html += `<option value="${item.value}">${item.text}</option>`;
+        }
+        html += `</select>`;
+
+        return html;
+    }
+
+    function addNewRow() {
+        const dateInput = `<input name="DailyEntries[${rowIndex}].Date" type="date" class="form-control" required />`;
+        const clientSelect = createSelect(`DailyEntries[${rowIndex}].ClientId`, clients);
+        const activitySelect = createSelect(`DailyEntries[${rowIndex}].ActivityId`, activities);
+        const projectSelect = createSelect(`DailyEntries[${rowIndex}].ProjectId`, projects);
+        const hoursInput = `<input name="DailyEntries[${rowIndex}].HoursWorked" type="number" step="0.1" class="form-control" required />`;
+        const descInput = `<input name="DailyEntries[${rowIndex}].Description" type="text" class="form-control" />`;
+        alert(activitySelect);
+        const row = `
+            <tr>
+                <td>${dateInput}</td>
+                <td>${clientSelect}</td>
+                <td>${activitySelect}</td>
+                <td>${projectSelect}</td>
+                <td>${hoursInput}</td>
+                <td>${descInput}</td>
+                <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">X</button></td>
+            </tr>`;
+        $('#timesheetBody').append(row);
+        rowIndex++;
+    }
+
+    function removeRow(btn) {
+        $(btn).closest('tr').remove();
+    }
+
+
+    //    addNewRow(); // Add first row on load
+    // });
+    $(document).ready(function () {
+        addNewRow();
+    });
+</script> 
+

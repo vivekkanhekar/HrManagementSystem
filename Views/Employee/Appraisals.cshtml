@@ -1,0 +1,128 @@
+﻿@model List<AppTemplateLatest>
+
+@{
+    ViewData["Title"] = "Appraisals";
+}
+
+<h2>Appraisal Templates</h2>
+
+@if (Model != null)
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Activity Name</th>
+                <th>Client Name</th>
+                <th>Department Name</th>
+                <th>Created Date</th>
+                @*                 <th> Measuring Keys</th>
+ *@                <th>Created ByManagerId</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var template in Model)
+            {
+                var keysJson = System.Text.Json.JsonSerializer.Serialize(template.MeasuringKeys);
+
+                <tr>
+                    <td>@template.ActivityId</td>
+                    <td>@template.Client.UserName</td>
+                    <td>@template.Department.Name</td>
+                    <td>@template.CreatedDate
+                    <td>
+                    <td>@template.Manager.UserName</td>
+                    <td>
+
+                        <button type="button" class="btn btn-primary"
+                                onclick='showMeasuringKeys(@template.Id, @Html.Raw(keysJson))'>
+                            Submit Appraisal
+                        </button>
+                                @*                         <button type="button" class="btn btn-primary" onclick="openModal(@template.Id)">Submit Appraisal</button>
+ *@                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No appraisal templates available.</p>
+}
+
+<!-- Modal for Submitting Appraisal -->
+
+
+@* <script>
+    function openModal(templateId) {
+        document.getElementById("templateId").value = templateId;
+        $('#appraisalModal').modal('show');
+    }
+</script> *@
+
+
+<form asp-action="Appraisals" asp-controller="Employee" method="post">
+    <!-- Display Measuring Keys Table -->
+    <div id="measuringKeysContainer" style="margin-top: 30px;">
+        <input type="hidden" id="templateId" name="templateId" />
+        <h4 id="selectedTemplateHeader" style="display:none;">Measuring Keys</h4>
+        <table id="measuringKeysTable" class="table table-bordered" style="display:none;">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Key</th>
+                    <th>Score (out of 10)</th>
+                </tr>
+
+            </thead>
+            <tbody>
+            </tbody>
+
+            <button type="submit">Submit</button>
+
+        </table>
+    </div>
+</form>
+
+
+
+<script>
+    function showMeasuringKeys(templateId, keys) {
+        const tableBody = document.querySelector("#measuringKeysTable tbody");
+        tableBody.innerHTML = ""; // Clear previous
+
+
+        keys.forEach((key, index) => {
+            const row = `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>
+                        ${key}
+                        <input type="hidden" name="keyNames[${index}]" value="${key}" />
+                    </td>
+                    <td>
+                        <input type="number" name="scores[${index}]" class="form-control" min="0" max="10" required />
+                    </td>
+                </tr>`;
+            tableBody.insertAdjacentHTML("beforeend", row);
+        });
+
+       @*  keys.forEach((key, index) => {
+            const row = `
+                <tr>
+                   
+                    <td>${index + 1}</td>
+                    <td>${key}</td>
+                    <td><input type="number" name="scores[${index}]" class="form-control" min="0" max="10" /></td>
+                </tr>`;
+            tableBody.insertAdjacentHTML("beforeend", row);
+        }); *@
+
+        document.getElementById("selectedTemplateHeader").style.display = "block";
+        document.getElementById("measuringKeysTable").style.display = "table";
+        document.getElementById("templateId").value = templateId;
+
+
+
+    }
+</script>

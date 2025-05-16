@@ -1,0 +1,107 @@
+﻿@using Microsoft.AspNetCore.Identity;
+
+
+    <form action="~/Account/Logout" method="post" id="logoutForm" class="navbar-right">
+        @Html.AntiForgeryToken()
+        @* <button type="submit" class="btn btn-danger navbar-btn">Logout</button> *@
+
+   @*  <a class="nav-link active" aria-current="page" href="#">Logout</a> *@
+    </form>
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HrManagementSystem</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/HrManagementSystem.styles.css" asp-append-version="true" />
+
+    <style type="text/css">
+        .navbar-brand {
+            background-color: blue;
+        }
+
+        .form-control
+        {
+            width:20%;
+        }
+        body {
+            background-color: #f0f2f5; /* Light gray background */
+        }
+    </style>
+</head>
+<body>
+    <header>
+      @*   <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">HrManagementSystem</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+                        </li>
+                       @*  <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Privacy">Privacy</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>  *@
+
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+               @*  <a class="navbar-brand" href="#">Navbar</a> *@
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">HR Management System</a>
+                        </li>
+                        
+                            <a class="nav-link active" asp-controller="SuperAdmin" asp-action="ViewEmployee">Employees</a>
+                            <a class="nav-link active" asp-controller="Client" asp-action="ClientList">Clients</a>
+                            <a class="nav-link active" asp-controller="Manager" asp-action="Index">Managers</a>
+                        
+                       @*  @if (User.IsInRole("Super Admin"))
+                        {
+                            <a class="nav-link active" aria-current="page" asp-controller="SuperAdmin" asp-action="ViewEmployee">Employees</a>
+                            <a class="nav-link active" aria-current="page" asp-controller="Client" asp-action="ClientList">Clients</a>
+                            <a class="nav-link active" aria-current="page"  asp-controller="Manager" asp-action="Index">Managers</a>
+                        } *@
+                    </ul>
+              
+
+                    <a class="nav-link active" aria-current="page" asp-controller="Account" asp-action="Logout">Logout</a>
+                </div>
+            </div>
+        </nav>
+      
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - HrManagementSystem - <a asp-area="" asp-controller="Login" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

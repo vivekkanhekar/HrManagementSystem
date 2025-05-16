@@ -1,0 +1,50 @@
+﻿
+ @model TimesheetEmployee
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index";
+}
+
+<h2>Welcome Manager</h2>
+
+<div class="tableContent" align="center">
+    <div class="col-md-4 w-50 d-grid align-content-center">
+        <table border="0" cellpadding="10" cellspacing="5" width="60%" align="center">
+            <tr>
+                <td>
+
+                    <a asp-controller="Manager" a asp-action="ViewTimesheets" class="btn btn-info">View Timesheets</a>
+                </td>
+                <td>
+                    <a asp-controller="Manager" asp-action="ApproveTimesheet" class="btn btn-info">Approve Timesheet</a>
+
+                </td>
+                <td>
+                    <a asp-controller="Manager" asp-action="DisapproveTimesheet" class="btn btn-success">DisApprove Timesheet</a>
+
+                </td>
+                <td>
+                    <a asp-controller="Manager" asp-action="AssignEmployee" class="btn btn-success">Assign Employees </a>
+
+                </td>
+                <td>
+                    <a asp-controller="Manager" asp-action="CreateAppraisalTemplate" class="btn btn-success">Create Appraisal STemplate </a>
+
+                </td>
+            </tr>
+
+             <tr>
+               
+           </tr>
+
+            <tr>
+            </tr>
+
+
+
+
+
+        </table>
+    </div>
+</div>

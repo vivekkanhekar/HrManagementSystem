@@ -1,0 +1,71 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="wwwroot\NewFolder\**" />
+    <Content Remove="wwwroot\NewFolder\**" />
+    <EmbeddedResource Remove="wwwroot\NewFolder\**" />
+    <None Remove="wwwroot\NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20250314093218_First.cs" />
+    <Compile Remove="Migrations\20250314093218_First.Designer.cs" />
+    <Compile Remove="Migrations\20250314115318_First1.cs" />
+    <Compile Remove="Migrations\20250314115318_First1.Designer.cs" />
+    <Compile Remove="Migrations\20250314115521_First2.cs" />
+    <Compile Remove="Migrations\20250314115521_First2.Designer.cs" />
+    <Compile Remove="Migrations\20250319050906_Department.cs" />
+    <Compile Remove="Migrations\20250319050906_Department.Designer.cs" />
+    <Compile Remove="Migrations\20250320105753_TimesheetEmp.cs" />
+    <Compile Remove="Migrations\20250320105753_TimesheetEmp.Designer.cs" />
+    <Compile Remove="Migrations\20250403085130_ISActive.cs" />
+    <Compile Remove="Migrations\20250403085130_ISActive.Designer.cs" />
+    <Compile Remove="Migrations\20250403111705_AddressNullable.cs" />
+    <Compile Remove="Migrations\20250403111705_AddressNullable.Designer.cs" />
+    <Compile Remove="Migrations\20250421085149_AddActivityProjectTables.cs" />
+    <Compile Remove="Migrations\20250421085149_AddActivityProjectTables.Designer.cs" />
+    <Compile Remove="Migrations\20250421092241_ActivityProjectCol.cs" />
+    <Compile Remove="Migrations\20250421092241_ActivityProjectCol.Designer.cs" />
+    <Compile Remove="Migrations\20250421093056_nullableDesscription.cs" />
+    <Compile Remove="Migrations\20250421093056_nullableDesscription.Designer.cs" />
+    <Compile Remove="Migrations\20250422121219_UpdateTimesheetModel.cs" />
+    <Compile Remove="Migrations\20250422121219_UpdateTimesheetModel.Designer.cs" />
+    <Compile Remove="Migrations\20250422121724_UpdateTimesheetModel2.cs" />
+    <Compile Remove="Migrations\20250422121724_UpdateTimesheetModel2.Designer.cs" />
+    <Compile Remove="Migrations\20250514043935_UpdateManagerId.Designer.cs" />
+    <Compile Remove="Migrations\20250514064317_AppTemplateOLD.cs" />
+    <Compile Remove="Migrations\20250514064317_AppTemplateOLD.Designer.cs" />
+    <Compile Remove="Migrations\20250514064716_AppTemplateLatest.cs" />
+    <Compile Remove="Migrations\20250514064716_AppTemplateLatest.Designer.cs" />
+    <Compile Remove="Migrations\20250514065410_AppTemplateLatest2.cs" />
+    <Compile Remove="Migrations\20250514065410_AppTemplateLatest2.Designer.cs" />
+    <Compile Remove="Migrations\20250514065647_AppTemplateLatest3.cs" />
+    <Compile Remove="Migrations\20250514065647_AppTemplateLatest3.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EPPlus" Version="7.5.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.14">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.14">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\AppraisalTemplate\" />
+  </ItemGroup>
+
+</Project>

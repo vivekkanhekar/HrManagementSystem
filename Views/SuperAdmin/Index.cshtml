@@ -1,0 +1,81 @@
+﻿ @model SuperAdmin
+@{
+    ViewBag.Title = "Index";
+
+}
+<h1> Welcome Super Admin.!</h1>
+
+<div class="tableContent" align="center">
+    
+        <div class="form-group">
+            <table border="0" cellpadding="10" cellspacing="5" width="80%">
+                <tr>
+                    <td>
+
+                        <a asp-action="ClientList">Client List</a>
+                    </td>
+                    <td>
+                        <a asp-action="AddClient">Add Client</a>
+                        @* <a asp-action="AddOwner">Assign Owners</a></span> *@
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+
+                        <a asp-action="ViewEmployee">Employee List</a>
+                    </td>
+                    <td>
+                        <a asp-action="AddEmployee">Add Employee</a>
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+
+                        <a asp-action="ViewManager">Manager List</a>
+                    </td>
+                    <td>
+                        <a asp-action="AddManager">Add Manage</a>
+                      
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+
+                        <a asp-action="ViewDepartment">Department List</a>
+                    </td>
+                    <td>
+                        <a asp-action="AddDepartment">Add Department</a>
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+
+                        <a asp-action="ViewProjects">Project List</a>
+                    </td>
+                    <td>
+                        <a asp-action="AddProject">Add Project</a>
+
+                    </td>
+                </tr>
+                <tr>
+
+                    <td>
+
+                        <a asp-action="ViewActivities">Activity List</a>
+                    </td>
+                    <td>
+                        <a asp-action="AddActivity">Add Activity</a>
+
+                    </td>
+                </tr>
+            </table>
+        </div>
+    
+</div>

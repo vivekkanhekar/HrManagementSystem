@@ -1,0 +1,45 @@
+﻿ @model TimesheetEmployee
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index";
+}
+
+<h1>Welcome Employee</h1>
+
+<div class="tableContent" align="center">
+    <div class="col-md-4 w-50 d-grid align-content-center">
+        <table border="0" cellpadding="10" cellspacing="5" width="60%" align="center">
+            <tr>
+                <td>
+
+                    <a asp-action="CreateTimesheet" class="btn btn-info">Create Timesheet</a>
+                </td>
+                <td>
+                    <a asp-controller="Employee" asp-action="MyTimesheets" class="btn btn-info">View My Timesheets</a>
+
+                </td>
+                <td>
+                    <a asp-controller="Employee" asp-action="Appraisals" class="btn btn-info"> My Appraisals</a>
+
+                </td>
+            </tr>
+
+          @*  <tr>
+               <td>
+                    <a asp-controller="Employee" asp-action="Create" class="btn btn-success">Submit Timesheet</a>
+
+               </td>
+           </tr> *@
+
+            <tr>
+                
+            </tr>
+
+            
+
+           
+           
+        </table>
+    </div>
+</div>

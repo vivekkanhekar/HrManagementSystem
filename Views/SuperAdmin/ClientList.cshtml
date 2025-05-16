@@ -1,0 +1,62 @@
+﻿@model List<User>
+@using Microsoft.AspNetCore.Identity
+
+@{
+    ViewData["Title"] = "ClientList";
+}
+
+<h1>ClientList</h1>
+
+<div class="row">
+    <div class="TableContent" align="center">
+        <div class="col-md-4 w-75 d-grid bg-gradient">
+            <form asp-action="EmployeeList" asp-asp-controller="Super Admin" method="get">
+                @if (@Model != null)
+                {
+                    <table class="table carousel-item-start">
+                        <thead>
+                            <tr>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Address</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var employee in Model)
+                            {
+                                <tr>
+
+                                    <td>@employee.FirstName</td>
+                                    <td>@employee.LastName</td>
+
+                                    <td>@employee.Email</td>
+                                    <td>@employee.PhoneNumber</td>
+
+                                    <td>@employee.Address</td>
+
+                                    <td>
+                                        <a asp-action="EditClient" asp-route-id="@employee.Id" class="btn btn-primary">Edit</a>
+                                    </td>
+                                    <td>
+                                        <a asp-action="DeleteClient" asp-route-id="@employee.Id" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this employee?');">Delete</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+
+                else
+                {
+                    <div class="text-danger">No data available.!</div>
+                }
+            </form>
+
+        </div>
+    </div>
+</div>
+
+

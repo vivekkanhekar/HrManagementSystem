@@ -1,0 +1,89 @@
+﻿@model HrManagementSystem.Models.User
+@{
+    ViewData["Title"] = "EditClient";
+}
+
+<h1>Edit</h1>
+
+<h4>User</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="EditClient" asp-controller="SuperAdmin" method="post">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="tableContent" align="center">
+                <div class="form-group">
+                    <table>
+                        <tr>
+                            <td>
+                                <label asp-for="FirstName" class="control-label"></label>
+                                <input asp-for="FirstName" class="form-control" />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td>
+                                <label asp-for="LastName" class="control-label"></label>
+                                <input asp-for="LastName" class="form-control" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td>
+                                <label asp-for="Email" class="control-label"></label>
+                                <input asp-for="Email" class="form-control" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+
+                            </td>
+
+                        </tr>
+                        @*   <div class="form-group">
+                <label>Department</label>
+                <select id="Department" required name="Department" asp-items="ViewBag.Departments" action="Post" class="dropdown">
+                    <option value="">Select Department</option>
+                </select>
+                <span asp-validation-for="Timesheets" class="text-danger"></span>
+            </div> *@
+                        <tr>
+                            <td>
+                                <label asp-for="PhoneNumber" class="control-label"></label>
+                                <input asp-for="PhoneNumber" class="form-control" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td>
+                                <label asp-for="Address" class="control-label"></label>
+                                <input asp-for="Address" class="form-control" />
+                                <span asp-validation-for="Address" class="text-danger"></span>
+
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="submit" value="Save" class="btn btn-primary" />
+                            </td>
+
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

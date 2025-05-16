@@ -1,0 +1,41 @@
+﻿@model Department
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<form asp-action="AddDepartment" method="post">
+    <div class="tableContent" align="center">
+        <div class="form-group">
+            <table>
+                <tr>
+                    <td>
+                        <label asp-for="Name"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </td>
+
+                </tr>
+                <tr><td>
+                    <label asp-for="Description"></label>
+                    <input asp-for="Description" class="form-control" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button type="submit" class="btn btn-primary">Add Department</button>
+                    </td>
+                </tr>
+                
+            </table>
+        </div>
+    </div>
+</form>

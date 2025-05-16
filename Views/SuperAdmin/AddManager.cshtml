@@ -1,0 +1,78 @@
+﻿@model User
+
+<h2>Add Manager</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<form asp-action="AddManager" asp-controller="SuperAdmin" method="post">
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="tableContent" align="center">
+        <div class="form-group">
+            <table>
+
+                <tr>
+                    <td>
+                        <label>First Name</label>
+                        <input asp-for="FirstName" class="form-control" />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label>Last Name</label>
+                        <input asp-for="LastName" class="form-control" />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label>Email</label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <td>
+                        <label>Address</label>
+                        <textarea asp-for="Address" class="form-control"></textarea>
+                    </td>
+                </tr>
+
+                @*  <div class="form-group">
+        <label>Department</label>
+        <select id="Department" required name="Department" asp-items="ViewBag.Departments" action="Post" class="dropdown">
+            <option value="">Select Department</option>
+        </select>
+        <span asp-validation-for="Department" class="text-danger"></span>
+    </div> *@
+
+
+                @*  <div class="form-group">
+        <label>Phone</label>
+        <input asp-for="Phone" class="form-control" />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div> *@
+
+                @* <div class="form-group">
+        <label>Address</label>
+        <textarea asp-for="Address" class="form-control"></textarea>
+    </div> *@
+                <tr>
+                    <td>
+                        <button type="submit" class="btn btn-primary">Add Manager</button>
+                    </td>
+                </tr>
+
+
+            </table>
+        </div>
+    </div>
+</form>
+

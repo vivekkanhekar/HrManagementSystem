@@ -7,6 +7,8 @@ namespace HrManagementSystem.Models
         public DateTime Date { get; set; }
         public string ClientId { get; set; }
         public string ProjectId { get; set; }
+        public string ManagerId { get; set; }
+
         public int ActivityId { get; set; }
         public decimal HoursWorked { get; set; }
         public string? Description { get; set; }

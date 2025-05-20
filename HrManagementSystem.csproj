@@ -47,6 +47,7 @@
     <Compile Remove="Migrations\20250514065410_AppTemplateLatest2.Designer.cs" />
     <Compile Remove="Migrations\20250514065647_AppTemplateLatest3.cs" />
     <Compile Remove="Migrations\20250514065647_AppTemplateLatest3.Designer.cs" />
+    <Compile Remove="Models\TimesheetEmployee.cs" />
   </ItemGroup>
 
   <ItemGroup>

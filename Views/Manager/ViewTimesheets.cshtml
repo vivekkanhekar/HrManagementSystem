@@ -1,11 +1,14 @@
-﻿@model List<Timesheet>
-<table class="table">
+﻿ @model List<Timesheet>
+
+ <table class="table">
     <thead>
         <tr>
             <th>Date</th>
             <th>Employee</th>
             <th>Client</th>
             <th>Project</th>
+            <th>Manager </th>
+
             <th>Hours</th>
             <th>Description</th>
             <th>Actions</th>
@@ -19,6 +22,8 @@
                 <td>@ts.Employee.UserName</td>
                 <td>@ts.Client.UserName</td>
                 <td>@ts.Project.ProjectName</td>
+                <td>@ts.Manager.UserName</td>
+
                 <td>@ts.HoursWorked</td>
                 <td>@ts.Description</td>
                 <td>

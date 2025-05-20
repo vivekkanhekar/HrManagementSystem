@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using static HrManagementSystem.Models.Timesheet;
+//using static HrManagementSystem.Models.Timesheet;
 
 namespace HrManagementSystem.Controllers
 {
@@ -49,6 +49,8 @@ namespace HrManagementSystem.Controllers
             {
                 Clients = _context.Timesheets.Select(c => new SelectListItem { Value = c.ClientId.ToString(), Text = c.Client.UserName }).ToList(),
                 Projects = _context.Project.Select(p => new SelectListItem { Value = p.ProjectId.ToString(), Text = p.ProjectName }).ToList(),
+                ManagerID = _context.Timesheets.Select(m => new SelectListItem { Value = m.ManagerID.ToString(), Text = m.Manager.UserName }).ToList(),
+
                 ActivityTasks = _context.Activities.Select(a => new SelectListItem { Value = a.ActivityId.ToString(), Text = a.ActivityName }).ToList()
             };
 
@@ -65,6 +67,7 @@ namespace HrManagementSystem.Controllers
                     EmployeeId = User.FindFirstValue(ClaimTypes.NameIdentifier),
                     ClientId = entry.ClientId.ToString(),
                     ProjectId = entry.ProjectId.ToString(),
+                    ManagerID = entry.ManagerID.ToString(),
                     ActivityId = entry.ActivityId,
                     Date = entry.Date,
                     HoursWorked = entry.HoursWorked,
@@ -104,6 +107,13 @@ namespace HrManagementSystem.Controllers
             }).ToList();
             ViewBag.Project = ProjectList;
 
+            var ManagerList = _context.Timesheets.Select(r => new SelectListItem
+            {
+                Value = r.ManagerID.ToString(),
+                Text = r.Manager.UserName
+            }).ToList();
+            ViewBag.Manager = ManagerList;
+
             var ActivityList = _context.Activities.Select(r => new SelectListItem
             {
                 Value = r.ActivityId.ToString(),
@@ -119,7 +129,7 @@ namespace HrManagementSystem.Controllers
                 ActivityId = timesheet.ActivityId,
                 HoursWorked = timesheet.HoursWorked,
                 Description = timesheet.Description,
-                
+
             };
 
             ViewBag.TimesheetId = id;
@@ -137,6 +147,7 @@ namespace HrManagementSystem.Controllers
             timesheet.Date = model.Date;
             timesheet.ClientId = model.ClientId;
             timesheet.ProjectId = model.ProjectId;
+            timesheet.ManagerID = model.ManagerId;
             timesheet.ActivityId = model.ActivityId;
             timesheet.HoursWorked = model.HoursWorked;
             timesheet.Description = model.Description;
@@ -156,7 +167,7 @@ namespace HrManagementSystem.Controllers
 
             if (timesheet == null)
                 return NotFound();
-
+            //return View();  
             return View(timesheet);
         }
 
@@ -178,10 +189,11 @@ namespace HrManagementSystem.Controllers
             var timesheets = _context.Timesheets
                 .Include(t => t.Client)
                 .Include(t => t.Project)
+                .Include(t => t.Manager)
                 .Include(t => t.Activity)
                 .Where(t => t.EmployeeId == user.Id)
                 .ToList();
-
+            //return View(user);
             return View(timesheets);
         }
         #endregion

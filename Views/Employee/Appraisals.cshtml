@@ -8,8 +8,8 @@
 
 @if (Model != null)
 {
-    <table class="table table-striped">
-        <thead>
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
             <tr>
                 <th>Activity Name</th>
                 <th>Client Name</th>
@@ -17,7 +17,7 @@
                 <th>Created Date</th>
                 @*                 <th> Measuring Keys</th>
  *@                <th>Created ByManagerId</th>
-
+                
             </tr>
         </thead>
         <tbody>
@@ -31,6 +31,7 @@
                     <td>@template.Department.Name</td>
                     <td>@template.CreatedDate
                     <td>
+                    
                     <td>@template.Manager.UserName</td>
                     <td>
 
@@ -61,7 +62,7 @@ else
 </script> *@
 
 
-<form asp-action="Appraisals" asp-controller="Employee" method="post">
+<form asp-action="Appraisals" asp-controller="Employee" method="post" class="mt-3">
     <!-- Display Measuring Keys Table -->
     <div id="measuringKeysContainer" style="margin-top: 30px;">
         <input type="hidden" id="templateId" name="templateId" />

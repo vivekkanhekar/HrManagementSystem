@@ -53,42 +53,45 @@ namespace HrManagementSystem.Controllers
         {
 
             var user = await _userManager.GetUserAsync(User);
-            var timesheets = _context.Timesheets
-                .Include(t => t.Client)
+
+            //var timesheets = _context.Timesheets
+            //    .Include(t => t.Client)
+            //    .Include(t => t.Project)
+            //    .Include(t => t.Activity)
+            //    .Where(t => t.ManagerID == user.Id)// not Employee its for managerID, one manager can have many employee, 
+            //    .ToList();
+            var timesheets = await _context.Timesheets
+                .Include(t => t.Employee)
                 .Include(t => t.Project)
-                .Include(t => t.Activity)
-                .Where(t => t.EmployeeId == user.Id)
-                .ToList();
-            //        var timesheets = await _context.Timesheets
-            //            .Include(t => t.Employee)
-            //            .Include(t => t.Project)
-            //            .Include(t => t.Client)
-            //            .Where(t => t.approval == null) //  logic
-            //            .ToListAsync();
-            //        var data = _context.Timesheets
-            //.Include(t => t.Employee) // assuming navigation property is Employee
-            //.Select(t => new DailyTimesheetEntry
-            //{
-            //    ClientId = t.ClientId,
-            //    ProjectId = t.ProjectId.ToString(),
-            //    ActivityId=t.ActivityId,
-            //    HoursWorked=t.HoursWorked,
-            //    Description = t.Description,
-            //    //ApprovalStatus=ApprovalStatus.Approved,
+                .Include(t => t.Client)
+                .Where(t => t.ManagerID == user.Id) 
+                                                    //.Where(t => t.approval == null) //  logic
+                .ToListAsync();
+            var data = _context.Timesheets
+    .Include(t => t.Employee) // assuming navigation property is Employee
+    .Select(t => new DailyTimesheetEntry
+    {
+        ClientId = t.ClientId,
+        ProjectId = t.ProjectId.ToString(),
+        ManagerID = t.ManagerID,
+        ActivityId = t.ActivityId,
+        HoursWorked = t.HoursWorked,
+        Description = t.Description,
+        //ApprovalStatus=ApprovalStatus.Approved,
 
-            //    //UserName = t.Employee.FirstName + " " + t.Employee.LastName,
-            //    //Date = t.Date,
-            //    //HoursWorked = t.HoursWorked,
-            //    //Approval = t.Approval
-            //}).ToList();
-
-            return View(timesheets);
+        //UserName = t.Employee.FirstName + " " + t.Employee.LastName,
+        //Date = t.Date,
+        //HoursWorked = t.HoursWorked,
+        //Approval = t.Approval
+    }).ToList();
+            return View(timesheets);  
+            //return View(timesheets);
         }
-        [HttpGet]
-        public async Task<IActionResult> ApproveTimesheet()
-        {
-            return View();
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> ApproveTimesheet()
+        //{
+        //    return View();
+        //}
         [HttpPost]
         public async Task<IActionResult> ApproveTimesheet(int id)
         {
@@ -102,11 +105,11 @@ namespace HrManagementSystem.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction("ViewTimesheets");
         }
-        [HttpGet]
-        public async Task<IActionResult> DisapproveTimesheet()
-        {
-            return View();
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> DisapproveTimesheet()
+        //{
+        //    return View();
+        //}
         [HttpPost]
         public async Task<IActionResult> DisapproveTimesheet(int id, string? reason)
         {

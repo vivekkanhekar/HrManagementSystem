@@ -10,9 +10,9 @@ namespace HrManagementSystem.Models
         public string ApprovedBy { get; set; }
         public string ApprovalStatus { get; set; } = "Pending";
         public DateTime? ApprovedAt { get; set; }
-        [ForeignKey("Timesheet")]
-        public int TimesheetId { get; set; }
-        public virtual Timesheet Timesheet { get; set; }
+        //[ForeignKey("Timesheet")]
+        //public int TimesheetId { get; set; }
+        //public virtual Timesheet Timesheet { get; set; }
 
         [ForeignKey("ApprovedByEmpId")]
         public User ApprovedByEmp { get; set; }

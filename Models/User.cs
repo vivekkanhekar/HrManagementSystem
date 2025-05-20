@@ -26,7 +26,7 @@ namespace HrManagementSystem.Models
 
         [DefaultValue(true)]
         public bool IsActive { get; set; } = true;
-        public ICollection<Timesheet> Timesheets { get; set; }
+        //public ICollection<Timesheet> Timesheets { get; set; }
         
     }
 }

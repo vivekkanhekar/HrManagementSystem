@@ -10,6 +10,8 @@
                 <th>Client</th>
                 <th>Activity</th>
                 <th>Project</th>
+                <th>Manager Name</th>
+                
                 <th>Hours Worked</th>
                 <th>Description</th>
                 <th></th>
@@ -39,6 +41,7 @@
     var clients = @Html.Raw(Json.Serialize(Model.Clients));
     var projects = @Html.Raw(Json.Serialize(Model.Projects));
     var activities = @Html.Raw(Json.Serialize(Model.ActivityTasks));
+    var managers = @Html.Raw(Json.Serialize(Model.ManagerID));
      //alert(clients);
 
 
@@ -57,6 +60,8 @@
         const clientSelect = createSelect(`DailyEntries[${rowIndex}].ClientId`, clients);
         const activitySelect = createSelect(`DailyEntries[${rowIndex}].ActivityId`, activities);
         const projectSelect = createSelect(`DailyEntries[${rowIndex}].ProjectId`, projects);
+                const managerSelect = createSelect(`DailyEntries[${rowIndex}].ManagerId`, managers);
+
         const hoursInput = `<input name="DailyEntries[${rowIndex}].HoursWorked" type="number" step="0.1" class="form-control" required />`;
         const descInput = `<input name="DailyEntries[${rowIndex}].Description" type="text" class="form-control" />`;
         alert(activitySelect);
@@ -66,6 +71,8 @@
                 <td>${clientSelect}</td>
                 <td>${activitySelect}</td>
                 <td>${projectSelect}</td>
+                                <td>${managerSelect}</td>
+
                 <td>${hoursInput}</td>
                 <td>${descInput}</td>
                 <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">X</button></td>

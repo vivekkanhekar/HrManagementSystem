@@ -18,9 +18,11 @@ namespace HrManagementSystem.Data
 
         public DbSet<Projects> Project { get; set; }
         public DbSet<Timesheet> Timesheets { get; set; }
+
+  
         //public DbSet<Approval> Approvals { get; set; }
         public DbSet<Role> Roles { get; set; }
-        public DbSet<TimesheetEmployee> TimesheetEmployee { get; set; }
+       // public DbSet<TimesheetEmployee> TimesheetEmployee { get; set; }
 
         public DbSet<Department> Departments { get; set; }
         public DbSet<EmployeeClientAssignment> EmployeeClientAssignments { get; set; }
@@ -50,15 +52,22 @@ namespace HrManagementSystem.Data
             });
 
             modelBuilder.Entity<Timesheet>()
-    .HasOne(t => t.Client)
-    .WithMany() // or .WithMany(u => u.Timesheets) if reverse navigation exists
-    .HasForeignKey(t => t.ClientId);
+     .HasOne(t => t.Employee)
+     .WithMany()
+     .HasForeignKey(t => t.EmployeeId)
+     .OnDelete(DeleteBehavior.Restrict);
 
-            //     modelBuilder.Entity<Approval>()
-            //.HasOne(a => a.Timesheet)
-            //.WithMany(t => t.Approvals)
-            //.HasForeignKey(a => a.TimesheetId)
-            //.OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<Timesheet>()
+                .HasOne(t => t.Manager)
+                .WithMany()
+                .HasForeignKey(t => t.ManagerID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Timesheet>()
+                .HasOne(t => t.Client)
+                .WithMany()
+                .HasForeignKey(t => t.ClientId)
+                .OnDelete(DeleteBehavior.Restrict);
 
 
 

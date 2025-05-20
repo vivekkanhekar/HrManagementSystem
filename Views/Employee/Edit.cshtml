@@ -24,6 +24,13 @@
         </select>
 
     </div>
+    <div class="form-group">
+        <label>Manager</label>
+        <select id="ManagerId" asp-for="ManagerId" required name="ManagerId" asp-items="ViewBag.Manager" action="Post" class="dropdown">
+            <option value="">--Select Manager--</option>
+        </select>
+
+    </div>
     <div>
         <label>Activity</label>
         <select id="ActivityId" asp-for="ActivityId" required name="ActivityId" asp-items="ViewBag.Activity" action="Post" class="dropdown">

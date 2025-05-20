@@ -14,8 +14,10 @@ namespace HrManagementSystem.Models
         public virtual User Client { get; set; }
 
         [Required]
-        [ForeignKey("User")]
         public string UserId { get; set; }
+
+        [ForeignKey("UserId")]
+        
         public virtual User User { get; set; }
 
         [Required]

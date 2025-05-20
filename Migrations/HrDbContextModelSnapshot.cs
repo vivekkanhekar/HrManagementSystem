@@ -242,6 +242,10 @@ namespace HrManagementSystem.Migrations
                     b.Property<decimal>("HoursWorked")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("ManagerID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("ProjectId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -257,45 +261,11 @@ namespace HrManagementSystem.Migrations
 
                     b.HasIndex("EmployeeId");
 
+                    b.HasIndex("ManagerID");
+
                     b.HasIndex("ProjectId");
 
                     b.ToTable("Timesheets");
-                });
-
-            modelBuilder.Entity("HrManagementSystem.Models.TimesheetEmployee", b =>
-                {
-                    b.Property<int>("timeemp_Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("timeemp_Id"));
-
-                    b.Property<string>("AdminId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ClientId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("DeparId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("timeemp_Id");
-
-                    b.HasIndex("AdminId");
-
-                    b.HasIndex("ClientId");
-
-                    b.HasIndex("DeparId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("TimesheetEmployee");
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.User", b =>
@@ -635,13 +605,19 @@ namespace HrManagementSystem.Migrations
                     b.HasOne("HrManagementSystem.Models.User", "Client")
                         .WithMany()
                         .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("HrManagementSystem.Models.User", "Employee")
-                        .WithMany("Timesheets")
+                        .WithMany()
                         .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HrManagementSystem.Models.User", "Manager")
+                        .WithMany()
+                        .HasForeignKey("ManagerID")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("HrManagementSystem.Models.Projects", "Project")
@@ -656,42 +632,9 @@ namespace HrManagementSystem.Migrations
 
                     b.Navigation("Employee");
 
+                    b.Navigation("Manager");
+
                     b.Navigation("Project");
-                });
-
-            modelBuilder.Entity("HrManagementSystem.Models.TimesheetEmployee", b =>
-                {
-                    b.HasOne("HrManagementSystem.Models.User", "Admin")
-                        .WithMany()
-                        .HasForeignKey("AdminId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HrManagementSystem.Models.User", "Client")
-                        .WithMany()
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HrManagementSystem.Models.Department", "Depart")
-                        .WithMany()
-                        .HasForeignKey("DeparId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HrManagementSystem.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Admin");
-
-                    b.Navigation("Client");
-
-                    b.Navigation("Depart");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -743,11 +686,6 @@ namespace HrManagementSystem.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("HrManagementSystem.Models.User", b =>
-                {
-                    b.Navigation("Timesheets");
                 });
 #pragma warning restore 612, 618
         }

@@ -92,38 +92,86 @@ namespace HrManagementSystem.Controllers
         //{
         //    return View();
         //}
-        [HttpPost]
-        public async Task<IActionResult> ApproveTimesheet(int id)
-        {
-            var timesheet = await _context.Timesheets.FindAsync(id);
-            if (timesheet == null) return NotFound();
+        //[HttpPost]
+        //public async Task<IActionResult> ApproveTimesheet(int id)
+        //{
+        //    var timesheet = await _context.Timesheets.FindAsync(id);
+        //    if (timesheet == null) return NotFound();
 
-            timesheet.approval = true;
-            timesheet.EmployeeId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            timesheet.Date = DateTime.Now;
+        //    timesheet.approval = true;
+        //    timesheet.EmployeeId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    timesheet.Date = DateTime.Now;
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction("ViewTimesheets");
-        }
+        //    await _context.SaveChangesAsync();
+        //    return RedirectToAction("ViewTimesheets");
+        //}
         //[HttpGet]
         //public async Task<IActionResult> DisapproveTimesheet()
         //{
         //    return View();
         //}
+        //[HttpPost]
+        //public async Task<IActionResult> DisapproveTimesheet(int id, string? reason)
+        //{
+        //    var timesheet = await _context.Timesheets.FindAsync(id);
+        //    if (timesheet == null) return NotFound();
+
+        //    timesheet.approval = false;
+        //    timesheet.DisapprovalReason = reason;
+        //    timesheet.EmployeeId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    timesheet.Date = DateTime.Now;
+
+        //    await _context.SaveChangesAsync();
+        //    return RedirectToAction("ViewTimesheets");
+        //}
+        [HttpPost]
+        public async Task<IActionResult> ApproveTimesheet(int id)
+        {
+            try
+            {
+                var timesheet = await _context.Timesheets.FindAsync(id);
+                if (timesheet != null)
+                {
+                    timesheet.approval = true;
+                    timesheet.EmployeeId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    timesheet.Date = DateTime.Now;
+
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("ViewTimesheets");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exception (e.g., log it)
+                ModelState.AddModelError("", "An error occurred while approving the timesheet: " + ex.Message);
+            }
+            return Json(new { success = false });
+        }
+
         [HttpPost]
         public async Task<IActionResult> DisapproveTimesheet(int id, string? reason)
         {
-            var timesheet = await _context.Timesheets.FindAsync(id);
-            if (timesheet == null) return NotFound();
+            try
+            {
+                var timesheet = await _context.Timesheets.FindAsync(id);
+                if (timesheet == null) return NotFound();
 
-            timesheet.approval = false;
-            timesheet.DisapprovalReason = reason;
-            timesheet.EmployeeId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            timesheet.Date = DateTime.Now;
+                timesheet.approval = false;
+                timesheet.DisapprovalReason = reason;
+                timesheet.EmployeeId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                timesheet.Date = DateTime.Now;
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction("ViewTimesheets");
+                await _context.SaveChangesAsync();
+                return RedirectToAction("ViewTimesheets");
+            }
+            catch (Exception ex)
+            {
+                // Handle exception (e.g., log it)
+                ModelState.AddModelError("", "An error occurred while disapproving the timesheet: " + ex.Message);
+            }
+            return Json(new { success = false });
         }
+
         [HttpGet]
         public IActionResult AssignEmployee()
         {

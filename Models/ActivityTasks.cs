@@ -12,7 +12,7 @@ namespace HrManagementSystem.Models
         public int ActivityId { get; set; }
         //public string? OperationName { get; set; }
         public string ActivityName { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         //public ActivityTasks(string operationName)
         //{
         //    OperationName = operationName;

@@ -50,9 +50,21 @@ namespace HrManagementSystem.Controllers
         [HttpGet]
         public IActionResult RoleList()
         {
-            var roles = _roleManager.Roles.ToList();
-            //var roles = _context.Roles.ToList();
-            return View(roles);
+            try
+            {
+                var roles = _roleManager.Roles.ToList();
+                //var roles = _context.Roles.ToList();
+                return View(roles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "An error occurred while listing the roles.",
+                    error = ex.Message
+                });
+            }
+
         }
 
         [HttpGet]
@@ -64,100 +76,136 @@ namespace HrManagementSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> AddRole(string roleName)
         {
-            if (!string.IsNullOrEmpty(roleName))
+            try
             {
-                Role role = new Role
+                if (!string.IsNullOrEmpty(roleName))
                 {
-                    Name = roleName,
-                    NormalizedName = roleName.ToUpper(),
-                    ConcurrencyStamp = Guid.NewGuid().ToString() // Generate a unique concurrency stamp
-                };
-
-                if (!await _roleManager.RoleExistsAsync(role.Name))
-                {
-                    var result = await _roleManager.CreateAsync((Role)role);
-
-                    if (result.Succeeded)
+                    Role role = new Role
                     {
-                        TempData["Success"] = "Role added successfully.";
-                    }
-                    else
-                    {
-                        TempData["Error"] = "Error adding role.";
-                    }
+                        Name = roleName,
+                        NormalizedName = roleName.ToUpper(),
+                        ConcurrencyStamp = Guid.NewGuid().ToString() // Generate a unique concurrency stamp
+                    };
 
-                    return RedirectToAction("RoleList");
+                    if (!await _roleManager.RoleExistsAsync(role.Name))
+                    {
+                        var result = await _roleManager.CreateAsync((Role)role);
+
+                        if (result.Succeeded)
+                        {
+                            TempData["Success"] = "Role added successfully.";
+                        }
+                        else
+                        {
+                            TempData["Error"] = "Error adding role.";
+                        }
+
+                        return RedirectToAction("RoleList");
+                    }
                 }
+
+                TempData["Error"] = "Role name cannot be empty.";
+                return RedirectToAction("RoleList");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred while adding the role.";
+                return RedirectToAction("RoleList");
             }
 
-            TempData["Error"] = "Role name cannot be empty.";
-            return RedirectToAction("RoleList");
         }
         [HttpGet]
         public async Task<IActionResult> EditRole(string id) // Change int? to string
         {
-            if (string.IsNullOrEmpty(id))
+            try
             {
-                return NotFound();
+                if (string.IsNullOrEmpty(id))
+                {
+                    return NotFound();
+                }
+
+                //  var user = await _context.Roles.FindAsync(id); // check roles not user
+
+                var role = _roleManager.Roles.ToList().Where(x => x.Id == id).First();
+                if (role == null)
+                {
+                    return NotFound();
+                }
+                return View(role);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred while retrieving the role.";
+                return RedirectToAction("RoleList");
             }
 
-            //  var user = await _context.Roles.FindAsync(id); // check roles not user
-
-            var role = _roleManager.Roles.ToList().Where(x => x.Id == id).First();
-            if (role == null)
-            {
-                return NotFound();
-            }
-            return View(role);
         }
         [HttpPost]
         public async Task<IActionResult> EditRole(string id, string roleName)
         {
-            var role = await _roleManager.FindByIdAsync(id);
-            if (role == null)
+            try
             {
-                TempData["Error"] = "Role not found.";
-                return RedirectToAction("RoleList");
-            }
-
-            if (!string.IsNullOrEmpty(roleName))
-            {
-                role.Name = roleName;
-                var result = await _roleManager.UpdateAsync(role);
-
-                if (result.Succeeded)
+                var role = await _roleManager.FindByIdAsync(id);
+                if (role == null)
                 {
-                    TempData["Success"] = "Role updated successfully.";
+                    TempData["Error"] = "Role not found.";
                     return RedirectToAction("RoleList");
+                }
+
+                if (!string.IsNullOrEmpty(roleName))
+                {
+                    role.Name = roleName;
+                    var result = await _roleManager.UpdateAsync(role);
+
+                    if (result.Succeeded)
+                    {
+                        TempData["Success"] = "Role updated successfully.";
+                        return RedirectToAction("RoleList");
+                    }
+                    else
+                    {
+                        TempData["Error"] = "Error updating role.";
+                    }
                 }
                 else
                 {
-                    TempData["Error"] = "Error updating role.";
+                    TempData["Error"] = "Role name cannot be empty.";
                 }
+
+                return View(role);
             }
-            else
+            catch (Exception ex)
             {
-                TempData["Error"] = "Role name cannot be empty.";
+                TempData["Error"] = "An error occurred while updating the role.";
+                return RedirectToAction("RoleList");
             }
 
-            return View(role);
         }
         [HttpGet]
         public async Task<IActionResult> DeleteRole(string id)
         {
-            var role = await _roleManager.FindByIdAsync(id);
-            if (role == null)
+            try
             {
-                TempData["Error"] = "Role not found.";
+                var role = await _roleManager.FindByIdAsync(id);
+                if (role == null)
+                {
+                    TempData["Error"] = "Role not found.";
+                    return RedirectToAction("RoleList");
+                }
+
+                return View(role);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred while retrieving the role.";
                 return RedirectToAction("RoleList");
             }
-
-            return View(role); // Passing role to the view
         }
 
         [HttpPost]
         public async Task<IActionResult> DeleteRoleConfirmed(string id)
         {
+
             var role = await _roleManager.FindByIdAsync(id);
             if (role == null)
             {
@@ -192,18 +240,30 @@ namespace HrManagementSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewEmployee()
         {
-            var employees = await _userManager.GetUsersInRoleAsync("Employee");
-
-            var model = employees.Select(emp => new EmployeeViewModel
+            try
             {
-                Id = emp.Id,
-                FirstName = emp.FirstName,
-                LastName = emp.LastName,
-                Email = emp.Email,
-                Address = emp.Address
-            }).ToList();
+                var employees = await _userManager.GetUsersInRoleAsync("Employee");
 
-            return View(model);
+                var model = employees.Select(emp => new EmployeeViewModel
+                {
+                    Id = emp.Id,
+                    FirstName = emp.FirstName,
+                    LastName = emp.LastName,
+                    Email = emp.Email,
+                    Address = emp.Address
+                }).ToList();
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "An error occurred while listing the employees.",
+                    error = ex.Message
+                });
+            }
+
         }
 
 
@@ -222,6 +282,12 @@ namespace HrManagementSystem.Controllers
 
             
             ViewBag.Roles = emplist;
+            var clientlist = _context.Timesheets.Select(r => new SelectListItem
+            {
+                Value = r.ClientId.ToString(),
+                Text = r.Client.UserName,
+            }).ToList();
+            ViewBag.Clients = clientlist;
             // Get department list
             var deplist = _context.Departments.Select(r => new SelectListItem
             {
@@ -596,7 +662,24 @@ public IActionResult DeleteDepartment(int id)
         [HttpGet]
         public async Task<IActionResult> EditClient(string id)
         {
-            return View();
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound("Error: Client not found.");
+            }
+
+            // Create a model and fill it with user data
+            var model = new User
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Address = user.Address
+            };
+
+            return View(model); // Pass the model to the view
         }
 
         [HttpPost]
@@ -621,6 +704,7 @@ public IActionResult DeleteDepartment(int id)
                 }
 
                 // Update client details
+
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
                 user.Email = model.Email;
@@ -631,7 +715,7 @@ public IActionResult DeleteDepartment(int id)
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
-                    return Ok("Success: Client Updated.");
+                    return RedirectToAction("ClientList");
                 }
 
                 return BadRequest(result.Errors.Select(e => e.Description).ToList());

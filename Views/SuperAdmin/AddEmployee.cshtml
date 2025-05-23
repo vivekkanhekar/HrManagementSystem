@@ -43,9 +43,20 @@
                     <td>
                         <label>Department</label>
                         <select id="Department" required name="Department" asp-items="ViewBag.Departments" action="Post" class="dropdown">
-                            <option value="">Select Department</option>
+                            <option value="">--Select Department--</option>
                         </select>
                         <span asp-validation-for="Department" class="text-danger"></span>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        <label>Client</label>
+                        <select id="Client" required name="Client" asp-items="ViewBag.Clients" action="Post" class="dropdown">
+                            <option value="">--Select Client--</option>
+                        </select>
+                        <span asp-validation-for="Client" class="text-danger"></span>
                     </td>
                 </tr>
 
@@ -77,7 +88,12 @@
         </div>
     </div>
 </form>
-
+<div>
+    <a asp-action="ViewEmployee" asp-controller="SuperAdmin">Back to List</a>
+</div>
+<div>
+    <a asp-action="Index" asp-controller="SuperAdmin">Back to Home</a>
+</div>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

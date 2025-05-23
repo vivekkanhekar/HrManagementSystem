@@ -27,34 +27,53 @@
                 <td>@ts.HoursWorked</td>
                 <td>@ts.Description</td>
                 <td>
-                    <form asp-action="ApproveTimesheet" method="post">
-                        <input type="hidden" name="id" value="@ts.TimesheetId" />
-                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
-                    </form>
-                    <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#disapproveModal-@ts.TimesheetId">Disapprove</button>
+                    <button class="btn btn-success approve-btn" data-id="@ts.TimesheetId">Approve</button>
+                    <button class="btn btn-danger disapprove-btn" data-id="@ts.TimesheetId">Disapprove</button>
 
                     <!-- Modal -->
-                    <div class="modal fade" id="disapproveModal-@ts.TimesheetId">
-                        <div class="modal-dialog">
-                            <form asp-action="DisapproveTimesheet" method="post">
-                                <input type="hidden" name="id" value="@ts.TimesheetId" />
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Disapprove Timesheet</h5>
-                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                    </div>
-                                    @* <div class="modal-body">
-                                        <textarea name="reason" class="form-control" required placeholder="Enter reason"></textarea>
-                                    </div> *@
-                                    <div class="modal-footer">
-                                        <button type="submit" class="btn btn-danger">Submit</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+                    
                 </td>
             </tr>
         }
     </tbody>
 </table>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.approve-btn').click(function () {
+            var timesheetId = $(this).data('id');
+
+            $.ajax({
+                url: '/Manager/ApproveTimesheet',
+                type: 'POST',
+                data: { id: timesheetId },
+                success: function (response) {
+                    alert('Timesheet Approved!');
+                    location.reload(); // Optional: Refresh the table
+                },
+                error: function () {
+                    alert('Error approving timesheet');
+                }
+            });
+        });
+
+        $('.disapprove-btn').click(function () {
+            var timesheetId = $(this).data('id');
+
+            $.ajax({
+                url: '/Manager/DisapproveTimesheet',
+                type: 'POST',
+                data: { id: timesheetId },
+                success: function (response) {
+                    alert('Timesheet Disapproved!');
+                    location.reload();
+                },
+                error: function () {
+                    alert('Error disapproving timesheet');
+                }
+            });
+        });
+    });
+</script>
+
+

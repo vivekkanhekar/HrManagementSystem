@@ -1,9 +1,13 @@
 ﻿@model HrManagementSystem.Models.ActivityTasks
+
 @{
     ViewBag.Title = "Add Activity";
 }
 
 <h2>Create Activity</h2>
+
+<!-- Display validation errors -->
+<div asp-validation-summary="All" class="text-danger"></div>
 
 <form asp-action="AddActivity" method="post">
     <div class="tableContent" align="center">
@@ -13,22 +17,23 @@
                     <td>
                         <label>Activity Name</label>
                         <input asp-for="ActivityName" class="form-control" />
+                        <span asp-validation-for="ActivityName" class="text-danger"></span>
                     </td>
                 </tr>
                 <tr>
                     <td>
                         <label>Description</label>
                         <input asp-for="Description" class="form-control" />
+                        <span asp-validation-for="Description" class="text-danger"></span>
                     </td>
                 </tr>
                 <tr>
                     <td>
                         <label>Project</label>
-                        <select id="ProjectId" required name="ProjectId" asp-items="ViewBag.Project" action="Post" class="dropdown">
+                        <select asp-for="ProjectId" asp-items="ViewBag.Project" class="form-control" required>
                             <option value="">Select Project</option>
                         </select>
-                        @*  <span asp-validation-for="Department" class="text-danger"></span>
-        <select asp-for="ProjectId" asp-items="ViewBag.Projects" class="form-control"></select> *@
+                        <span asp-validation-for="ProjectId" class="text-danger"></span>
                     </td>
                 </tr>
                 <tr>
@@ -39,5 +44,8 @@
             </table>
         </div>
     </div>
-
 </form>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

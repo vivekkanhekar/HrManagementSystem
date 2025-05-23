@@ -26,6 +26,47 @@
  <button type="submit" class="btn btn-primary">Submit</button>
 </form>
 <style>
+    .form-control {
+        width: 150px;
+        padding: 6px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        text-align: center;
+    }
+
+    .timesheet-table th,
+    .timesheet-table td {
+        padding: 10px;
+        text-align: center;
+    }
+
+    .timesheet-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .timesheet-table input[type="text"],
+        .timesheet-table input[type="date"],
+        .timesheet-table input[type="number"],
+        .timesheet-table textarea {
+            width: 150px;
+        }
+
+    .btn-delete {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 6px 10px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+</style>
+
+<style>
 
     .form-control{
         width:50%;
@@ -37,7 +78,7 @@
 <script>
       // $(document).ready(function () {  
     var rowIndex = 0;
-    alert(rowIndex);
+    // alert(rowIndex);
     var clients = @Html.Raw(Json.Serialize(Model.Clients));
     var projects = @Html.Raw(Json.Serialize(Model.Projects));
     var activities = @Html.Raw(Json.Serialize(Model.ActivityTasks));
@@ -64,7 +105,7 @@
 
         const hoursInput = `<input name="DailyEntries[${rowIndex}].HoursWorked" type="number" step="0.1" class="form-control" required />`;
         const descInput = `<input name="DailyEntries[${rowIndex}].Description" type="text" class="form-control" />`;
-        alert(activitySelect);
+        // alert(activitySelect);
         const row = `
             <tr>
                 <td>${dateInput}</td>

@@ -96,21 +96,38 @@ namespace HrManagementSystem.Controllers
         }
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
-            return RedirectToAction("Login", "Account");
+            try
+            {
+                await _signInManager.SignOutAsync();
+                return RedirectToAction("Login", "Account");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View("Login");
+            }
         }
 
         public async Task<IActionResult> SeedRoles()
         {
-            string[] roles = { "Super Admin", "Manager", "Employee", "Client" };
-            foreach (var role in roles)
+            try
             {
-                if (!await _roleManager.RoleExistsAsync(role))
+                string[] roles = { "Super Admin", "Manager", "Employee", "Client" };
+                foreach (var role in roles)
                 {
-                    await _roleManager.CreateAsync(new Role { Name = role });
+                    if (!await _roleManager.RoleExistsAsync(role))
+                    {
+                        await _roleManager.CreateAsync(new Role { Name = role });
+                    }
                 }
+                return Content("Roles Seeded Successfully");
             }
-            return Content("Roles Seeded Successfully");
+
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View("Error");
+            }   
         }
         public IActionResult Register()
         {
@@ -119,30 +136,55 @@ namespace HrManagementSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(string name, string email, string password, string role)
         {
-            var user = new User { UserName = email, Email = email };
-            var result = await _userManager.CreateAsync(user, password);
-            if (result.Succeeded)
+            try
             {
-                await _userManager.AddToRoleAsync(user, role);
-                return RedirectToAction("Login");
+                var user = new User { UserName = email, Email = email };
+                var result = await _userManager.CreateAsync(user, password);
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, role);
+                    return RedirectToAction("Login");
+                }
+                ModelState.AddModelError("", "Registration failed.");
+                return View();
             }
-            ModelState.AddModelError("", "Registration failed.");
-            return View();
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View();
+            }
+
         }
         public async Task<IActionResult> UserList()
         {
-            var users = _userManager.Users.ToList();
-            return View(users);
+            try
+            {
+                var users = _userManager.Users.ToList();
+                return View(users);
+            }
+           catch(Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View("Error");
+            }
         }
 
         public async Task<IActionResult> DeleteUser(string id)
         {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user != null)
+            try
             {
-                await _userManager.DeleteAsync(user);
+                var user = await _userManager.FindByIdAsync(id);
+                if (user != null)
+                {
+                    await _userManager.DeleteAsync(user);
+                }
+                return RedirectToAction("UserList");
             }
-            return RedirectToAction("UserList");
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View("Error");
+            }
         }
     }
 }

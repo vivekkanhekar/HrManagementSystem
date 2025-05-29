@@ -1,14 +1,13 @@
-﻿ @model List<Timesheet>
+﻿@model List<Timesheet>
 
- <table class="table">
+<table class="table">
     <thead>
         <tr>
             <th>Date</th>
             <th>Employee</th>
             <th>Client</th>
             <th>Project</th>
-            <th>Manager </th>
-
+            <th>Manager</th>
             <th>Hours</th>
             <th>Description</th>
             <th>Actions</th>
@@ -23,20 +22,23 @@
                 <td>@ts.Client.UserName</td>
                 <td>@ts.Project.ProjectName</td>
                 <td>@ts.Manager.UserName</td>
-
                 <td>@ts.HoursWorked</td>
                 <td>@ts.Description</td>
                 <td>
                     <button class="btn btn-success approve-btn" data-id="@ts.TimesheetId">Approve</button>
                     <button class="btn btn-danger disapprove-btn" data-id="@ts.TimesheetId">Disapprove</button>
 
-                    <!-- Modal -->
-                    
+                    <!-- Disapproval reason form -->
+                    <div class="disapprove-reason mt-2" style="display:none;" id="disapprove-form-@ts.TimesheetId">
+                        <input type="text" class="form-control mb-1 reason-input" placeholder="Enter reason" />
+                        <button class="btn btn-warning submit-reason-btn" data-id="@ts.TimesheetId">Submit</button>
+                    </div>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
@@ -47,9 +49,9 @@
                 url: '/Manager/ApproveTimesheet',
                 type: 'POST',
                 data: { id: timesheetId },
-                success: function (response) {
+                success: function () {
                     alert('Timesheet Approved!');
-                    location.reload(); // Optional: Refresh the table
+                    location.reload();
                 },
                 error: function () {
                     alert('Error approving timesheet');
@@ -59,13 +61,24 @@
 
         $('.disapprove-btn').click(function () {
             var timesheetId = $(this).data('id');
+            $('#disapprove-form-' + timesheetId).toggle(); // Toggle visibility of reason box
+        });
+
+        $('.submit-reason-btn').click(function () {
+            var timesheetId = $(this).data('id');
+            var reason = $('#disapprove-form-' + timesheetId).find('.reason-input').val();
+
+            if (!reason.trim()) {
+                alert("Please enter a reason.");
+                return;
+            }
 
             $.ajax({
                 url: '/Manager/DisapproveTimesheet',
                 type: 'POST',
-                data: { id: timesheetId },
-                success: function (response) {
-                    alert('Timesheet Disapproved!');
+                data: { id: timesheetId, reason: reason },
+                success: function () {
+                    alert('Timesheet Disapproved with reason!');
                     location.reload();
                 },
                 error: function () {
@@ -75,5 +88,3 @@
         });
     });
 </script>
-
-

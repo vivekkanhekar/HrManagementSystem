@@ -51,40 +51,51 @@ namespace HrManagementSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewTimesheets()
         {
+            try
+            {
 
-            var user = await _userManager.GetUserAsync(User);
 
-            //var timesheets = _context.Timesheets
-            //    .Include(t => t.Client)
-            //    .Include(t => t.Project)
-            //    .Include(t => t.Activity)
-            //    .Where(t => t.ManagerID == user.Id)// not Employee its for managerID, one manager can have many employee, 
-            //    .ToList();
-            var timesheets = await _context.Timesheets
-                .Include(t => t.Employee)
-                .Include(t => t.Project)
-                .Include(t => t.Client)
-                .Where(t => t.ManagerID == user.Id) 
-                                                    //.Where(t => t.approval == null) //  logic
-                .ToListAsync();
-            var data = _context.Timesheets
-    .Include(t => t.Employee) // assuming navigation property is Employee
-    .Select(t => new DailyTimesheetEntry
-    {
-        ClientId = t.ClientId,
-        ProjectId = t.ProjectId.ToString(),
-        ManagerID = t.ManagerID,
-        ActivityId = t.ActivityId,
-        HoursWorked = t.HoursWorked,
-        Description = t.Description,
-        //ApprovalStatus=ApprovalStatus.Approved,
 
-        //UserName = t.Employee.FirstName + " " + t.Employee.LastName,
-        //Date = t.Date,
-        //HoursWorked = t.HoursWorked,
-        //Approval = t.Approval
-    }).ToList();
-            return View(timesheets);  
+                var user = await _userManager.GetUserAsync(User);
+
+                //var timesheets = _context.Timesheets
+                //    .Include(t => t.Client)
+                //    .Include(t => t.Project)
+                //    .Include(t => t.Activity)
+                //    .Where(t => t.ManagerID == user.Id)// not Employee its for managerID, one manager can have many employee, 
+                //    .ToList();
+                var timesheets = await _context.Timesheets
+                    .Include(t => t.Employee)
+                    .Include(t => t.Project)
+                    .Include(t => t.Client)
+                    .Where(t => t.ManagerID == user.Id)
+                    //.Where(t => t.approval == null) //  logic
+                    .ToListAsync();
+                var data = _context.Timesheets
+        .Include(t => t.Employee) // assuming navigation property is Employee
+        .Select(t => new DailyTimesheetEntry
+        {
+            ClientId = t.ClientId,
+            ProjectId = t.ProjectId.ToString(),
+            ManagerID = t.ManagerID,
+            ActivityId = t.ActivityId,
+            HoursWorked = t.HoursWorked,
+            Description = t.Description,
+            //ApprovalStatus=ApprovalStatus.Approved,
+
+            //UserName = t.Employee.FirstName + " " + t.Employee.LastName,
+            //Date = t.Date,
+            //HoursWorked = t.HoursWorked,
+            //Approval = t.Approval
+        }).ToList();
+                return View(timesheets);
+            }
+            catch (Exception ex)
+            {
+                // Handle exception (e.g., log it)
+                ModelState.AddModelError("", "An error occurred while retrieving timesheets: " + ex.Message);
+            }
+            return View();
             //return View(timesheets);
         }
         //[HttpGet]
@@ -175,23 +186,31 @@ namespace HrManagementSystem.Controllers
         [HttpGet]
         public IActionResult AssignEmployee()
         {
+            try
+            {
+                var employees = _userManager.GetUsersInRoleAsync("Employee").Result
+       .Select(e => new SelectListItem
+       {
+           Value = e.Id,
+           Text = e.UserName // or FullName
+       }).ToList();
 
-            var employees = _userManager.GetUsersInRoleAsync("Employee").Result
-        .Select(e => new SelectListItem
-        {
-            Value = e.Id,
-            Text = e.UserName // or FullName
-        }).ToList();
+                var clients = _userManager.GetUsersInRoleAsync("Client").Result
+                    .Select(c => new SelectListItem
+                    {
+                        Value = c.Id.ToString(),
+                        Text = c.UserName
+                    }).ToList();
 
-            var clients = _userManager.GetUsersInRoleAsync("Client").Result
-                .Select(c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = c.UserName
-                }).ToList();
+                ViewBag.EmployeeList = employees;
+                ViewBag.ClientList = clients;
 
-            ViewBag.EmployeeList = employees;
-            ViewBag.ClientList = clients;
+            }
+            catch (Exception ex)
+            {
+                // Handle exception (e.g., log it)
+                ModelState.AddModelError("", "An error occurred while loading employees and clients: " + ex.Message);
+            }
 
             return View();
         }
@@ -199,45 +218,64 @@ namespace HrManagementSystem.Controllers
         [HttpPost]
         public IActionResult AssignEmployee(string EmployeeId, List<string> ClientIds)
         {
-            var managerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            foreach (var clientId in ClientIds)
+            try
             {
-                _context.EmployeeClientAssignments.Add(new EmployeeClientAssignment
+                var managerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                foreach (var clientId in ClientIds)
                 {
-                    EmployeeId = EmployeeId,
-                    ClientId = clientId,
-                    ManagerId = managerId
-                });
+                    _context.EmployeeClientAssignments.Add(new EmployeeClientAssignment
+                    {
+                        EmployeeId = EmployeeId,
+                        ClientId = clientId,
+                        ManagerId = managerId
+                    });
+                }
+                _context.SaveChanges();
+                return RedirectToAction("Index");
             }
-            _context.SaveChanges();
-            return RedirectToAction("Index");
+            catch (Exception ex)
+            {
+                // Handle exception (e.g., log it)
+                ModelState.AddModelError("", "An error occurred while assigning employees: " + ex.Message);
+            }
+            return View();
+
         }
         [HttpGet]
 
         public IActionResult CreateAppraisalTemplate()
         {
-
-            var deptList = _context.Departments.Select(r => new SelectListItem
+            try
             {
-                Value = r.Id.ToString(),
-                Text = r.Name
-            }).ToList();
-            ViewBag.Department = deptList;
+                var deptList = _context.Departments.Select(r => new SelectListItem
+                {
+                    Value = r.Id.ToString(),
+                    Text = r.Name
+                }).ToList();
+                ViewBag.Department = deptList;
 
-            var ClientList = _context.EmployeeClientAssignments.Select(r => new SelectListItem
-            {
-                Value = r.ClientId.ToString(),
-                Text = r.Client.UserName
-            }).ToList();
-            ViewBag.Client = ClientList;
+                var ClientList = _context.EmployeeClientAssignments.Select(r => new SelectListItem
+                {
+                    Value = r.ClientId.ToString(),
+                    Text = r.Client.UserName
+                }).ToList();
+                ViewBag.Client = ClientList;
 
-            var ActivityList = _context.Activities.Select(r => new SelectListItem
+                var ActivityList = _context.Activities.Select(r => new SelectListItem
+                {
+                    Value = r.ActivityId.ToString(),
+                    Text = r.ActivityName
+                }).ToList();
+                ViewBag.Activity = ActivityList;
+                return View();
+            }
+            catch(Exception ex)
             {
-                Value = r.ActivityId.ToString(),
-                Text = r.ActivityName
-            }).ToList();
-            ViewBag.Activity = ActivityList;
+                // Handle exception (e.g., log it)
+                ModelState.AddModelError("", "An error occurred while loading the appraisal template: " + ex.Message);
+            }
             return View();
+
         }
         [HttpPost]
         public async Task<IActionResult> CreateAppraisalTemplate([FromForm] IFormFile file, AppTemplateLatest template)
@@ -431,30 +469,39 @@ namespace HrManagementSystem.Controllers
         //}
         public async Task<string> RenderViewToStringAsync(string viewName, object model)
         {
-            var actionContext = new ActionContext(HttpContext, RouteData, ControllerContext.ActionDescriptor);
-
-            using var sw = new StringWriter();
-            var viewResult = _viewEngine.FindView(actionContext, viewName, false);
-
-            if (viewResult.View == null)
-                throw new ArgumentNullException($"{viewName} does not match any available view");
-
-            var viewDictionary = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+            try
             {
-                Model = model
-            };
+                var actionContext = new ActionContext(HttpContext, RouteData, ControllerContext.ActionDescriptor);
 
-            var viewContext = new ViewContext(
-                actionContext,
-                viewResult.View,
-                viewDictionary,
-                new TempDataDictionary(HttpContext, (ITempDataProvider)TempData),
-                sw,
-                new HtmlHelperOptions()
-            );
+                using var sw = new StringWriter();
+                var viewResult = _viewEngine.FindView(actionContext, viewName, false);
 
-            await viewResult.View.RenderAsync(viewContext);
-            return sw.ToString();
+                if (viewResult.View == null)
+                    throw new ArgumentNullException($"{viewName} does not match any available view");
+
+                var viewDictionary = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+                {
+                    Model = model
+                };
+
+                var viewContext = new ViewContext(
+                    actionContext,
+                    viewResult.View,
+                    viewDictionary,
+                    new TempDataDictionary(HttpContext, (ITempDataProvider)TempData),
+                    sw,
+                    new HtmlHelperOptions()
+                );
+
+                await viewResult.View.RenderAsync(viewContext);
+                return sw.ToString();
+            }
+            catch (Exception ex)
+            {
+                // Handle exception (e.g., log it)
+                throw new InvalidOperationException("Error rendering view to string: " + ex.Message, ex);
+            }
+
         }
 
         //if (file != null)
@@ -500,19 +547,29 @@ namespace HrManagementSystem.Controllers
         //}
         public async Task<List<SelectListItem>> getUserByRoles(string roleName)
         {
-            var usersInRole = new List<User>();
-            usersInRole = await GetUsersInRoleAsync(roleName);
-
-
-            var selectUserList = usersInRole.Select(u => new SelectListItem
+            try
             {
-                Value = u.Id,
-                Text = u.UserName
-            }).ToList();
+                var usersInRole = new List<User>();
+                usersInRole = await GetUsersInRoleAsync(roleName);
+
+
+                var selectUserList = usersInRole.Select(u => new SelectListItem
+                {
+                    Value = u.Id,
+                    Text = u.UserName
+                }).ToList();
 
 
 
-            return selectUserList;
+                return selectUserList;
+            }
+            catch(Exception ex)
+            {
+                // Handle exception (e.g., log it)
+                ModelState.AddModelError("", "An error occurred while retrieving users: " + ex.Message);
+                return new List<SelectListItem>();
+            }
+
         }
         private async Task<List<User>> GetUsersInRoleAsync(string roleName)
         {

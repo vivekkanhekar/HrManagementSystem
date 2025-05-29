@@ -14,12 +14,11 @@ namespace HrManagementSystem.Models
         [Required, EmailAddress]
         public string Email { get; set; }
         public string? Department { get; set; }
-        [Required]
+        
+        public string? Client { get; set; }
 
-        public string Client { get; set; }
-
-        [Required]
-        public string Phone { get; set; }
+        
+        public string? Phone { get; set; }
 
         public string? Address { get; set; }
     }

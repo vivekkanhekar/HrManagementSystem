@@ -43,22 +43,31 @@ namespace HrManagementSystem.Controllers
         //}
         public IActionResult Index()
         {
-            var userId = _userManager.GetUserId(User); // Get logged-in employee's ID
+            try
+            {
+                var userId = _userManager.GetUserId(User); // Get logged-in employee's ID
 
-            var approvedTimesheets = _context.Timesheets
-                .Where(t => /*t.EmployeeId == userId &&*/ t.approval == true)
-                .Select(t => new TimesheetEntryViewModel
-                {
-                    Date = t.Date,
-                    ClientId = t.Client.Email,
-                    ProjectId = t.Project.ProjectName,
-                    ManagerId = t.Manager.UserName,
-                    HoursWorked = t.HoursWorked,
-                    Description = t.Description
-                })
-                .ToList();
+                var approvedTimesheets = _context.Timesheets
+                    .Where(t => /*t.EmployeeId == userId &&*/ t.approval == true)
+                    .Select(t => new TimesheetEntryViewModel
+                    {
+                        Date = t.Date,
+                        ClientId = t.Client.Email,
+                        ProjectId = t.Project.ProjectName,
+                        ManagerId = t.Manager.UserName,
+                        HoursWorked = t.HoursWorked,
+                        Description = t.Description
+                    })
+                    .ToList();
 
-            return View(approvedTimesheets);
+                return View(approvedTimesheets);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = "An error occurred while loading the timesheets.";
+                return View("Error");
+            }
+
         }
 
         #region Timesheet crud

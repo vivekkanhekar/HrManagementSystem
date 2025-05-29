@@ -17,7 +17,7 @@ namespace HrManagementSystem.Models
         //public string Email { get; set; }
 
         [DataType(DataType.Password)]
-        public string Password { get; set; }
+        public string? Password { get; set; }
         //public int Phone { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         //public virtual ICollection<ClientAdmin> ClientAdmins { get; set; } = new List<ClientAdmin>();

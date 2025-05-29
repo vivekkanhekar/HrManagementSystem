@@ -21,17 +21,26 @@ namespace HrManagementSystem
         }
         public string GenerateAlphaNumericPwd()
         {
-            string numbers = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()-=";
-            Random objrandom = new Random();
-            string passwordString = "";
-            string strrandom = string.Empty;
-            for (int i = 0; i < 8; i++)
+            try
             {
-                int temp = objrandom.Next(0, numbers.Length);
-                passwordString = numbers.ToCharArray()[temp].ToString();
-                strrandom += passwordString;
+                string numbers = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()-=";
+                Random objrandom = new Random();
+                string passwordString = "";
+                string strrandom = string.Empty;
+                for (int i = 0; i < 8; i++)
+                {
+                    int temp = objrandom.Next(0, numbers.Length);
+                    passwordString = numbers.ToCharArray()[temp].ToString();
+                    strrandom += passwordString;
+                }
+                return strrandom;
             }
-            return strrandom;
+            catch (Exception ex)
+            {
+                // Log the exception (ex) as needed
+                return string.Empty; // or handle it as per your requirement
+            }
+
         }
 
     }

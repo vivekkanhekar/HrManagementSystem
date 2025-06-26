@@ -1,0 +1,54 @@
+﻿@model List<AppraisalResponse>
+
+@{
+    ViewBag.Title = "Employee Appraisals";
+}
+
+<h2>Employee Appraisals</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Employee</th>
+            <th>Template</th>
+
+            <th>Activity</th>
+            <th>Submitted Date</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var appraisal in Model)
+        {
+            <tr>
+                <td>@appraisal.Employee</td>
+                <td>@appraisal.Template</td>
+                @*  <td>@appraisal.KeyEntries</td> *@
+
+                <td>
+                    <ul>
+                        @for (int i = 0; i < appraisal.KeyEntries?.Count; i++)
+                        {
+
+
+                            var keyPairs = appraisal.KeyEntries[i]?.Split(',') ?? new string[0];
+                            foreach (var pair in keyPairs)
+                            {
+                                var parts = pair.Split(':');
+                                if (parts.Length == 2)
+                                {
+                                    var key = parts[0].Trim();
+                                    var score = parts[1].Trim();
+                                    <li><b>@key: @score / 10</b> </li>
+                                }
+                            }
+
+                        }
+                    </ul>
+                </td>
+                <td>@appraisal.SubmittedDate.ToShortDateString()</td>
+             
+            </tr>
+        }
+    </tbody>
+</table>

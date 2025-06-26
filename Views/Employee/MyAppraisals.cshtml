@@ -1,0 +1,87 @@
+﻿@model IEnumerable<HrManagementSystem.Models.AppraisalResponse>
+
+@{
+    ViewBag.Title = "My Appraisals";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>My Submitted Appraisals</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+@*             <th>Template</th>
+ *@            <th>Assessment</th>
+            <th>Submitted Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+@*                     <td>@item.AppraisalTemplateId</td>
+ *@                    <td>
+                        <ul>
+                            @for (int i = 0; i < item.KeyEntries?.Count; i++)
+                            {
+
+
+                                var keyPairs = item.KeyEntries[i]?.Split(',') ?? new string[0];
+
+                                @foreach (var pair in keyPairs)
+                                {
+                                    var parts = pair.Split(':');
+                                    if (parts.Length == 2)
+                                    {
+                                        var key = parts[0].Trim();
+                                        var scoreText = parts[1].Trim();
+
+                                        if (double.TryParse(scoreText, out double scoreValue))
+                                        {
+                                            var percentage = (scoreValue / 10) * 100;
+                                            <li>
+                                                <b>@key: @scoreValue / 10</b>
+                                                <br />
+                                                <span class="text-muted">Rating: @percentage.ToString("F0")%</span>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li><b>@key: @scoreText</b></li>
+                                        }
+                                    }
+                                }
+
+                               @*  foreach (var pair in keyPairs)
+                                {
+                                    var parts = pair.Split(':');
+                                    if (parts.Length == 2)
+                                    {
+                                        var key = parts[0].Trim();
+                                        var score = parts[1].Trim();
+                                        <li><b>@key: @score / 10</b> </li>
+                                    }
+                                } *@
+
+                            }
+                        </ul>
+                    </td>
+                    <td>@item.SubmittedDate.ToShortDateString()</td>
+                    <td>
+                        <a asp-action="EditAppraisal" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Edit</a>
+                        <a asp-action="DeleteAppraisal" asp-route-id="@item.Id" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this appraisal?');">Delete</a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4" class="text-center text-muted">No appraisal records found.</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -16,30 +16,33 @@
                 <th>Department Name</th>
                 <th>Created Date</th>
                 @*                 <th> Measuring Keys</th>
- *@                <th>Created ByManagerId</th>
-                
+ *@                <th>Manager Name</th>
+
             </tr>
         </thead>
         <tbody>
             @foreach (var template in Model)
             {
                 var keysJson = System.Text.Json.JsonSerializer.Serialize(template.MeasuringKeys);
+                var remarksJson = System.Text.Json.JsonSerializer.Serialize(template.Remarks);
+                var amountJson = System.Text.Json.JsonSerializer.Serialize(template.Amount);
 
                 <tr>
                     <td>@template.ActivityId</td>
                     <td>@template.Client.UserName</td>
                     <td>@template.Department.Name</td>
-                    <td>@template.CreatedDate
-                    <td>
-                    
+                    <td>@template.CreatedDate</td>
                     <td>@template.Manager.UserName</td>
-                    <td>
+                    @*                     <td class="d-none remarksColumn"><input type="text" class="form-control" name="Remarks"></td>
+ *@                
+
+                            <td>
 
                         <button type="button" class="btn btn-primary"
-                                onclick='showMeasuringKeys(@template.Id, @Html.Raw(keysJson))'>
+                                onclick='showMeasuringKeys(@template.Id, @Html.Raw(keysJson),@Html.Raw(remarksJson),@Html.Raw(amountJson))'>
                             Submit Appraisal
                         </button>
-                                @*                         <button type="button" class="btn btn-primary" onclick="openModal(@template.Id)">Submit Appraisal</button>
+                        @*                         <button type="button" class="btn btn-primary" onclick="openModal(@template.Id)">Submit Appraisal</button>
  *@                    </td>
                 </tr>
             }
@@ -64,15 +67,18 @@ else
 
 <form asp-action="Appraisals" asp-controller="Employee" method="post" class="mt-3">
     <!-- Display Measuring Keys Table -->
-    <div id="measuringKeysContainer" style="margin-top: 30px;">
+    <div id="measuringKeysContainer" style="margin-top: 30px;" align="center">
         <input type="hidden" id="templateId" name="templateId" />
         <h4 id="selectedTemplateHeader" style="display:none;">Measuring Keys</h4>
-        <table id="measuringKeysTable" class="table table-bordered" style="display:none;">
+        <table id="measuringKeysTable" class="table table-bordered w-50" style="display:none;text-align:center;">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Key</th>
                     <th>Score (out of 10)</th>
+                  
+                        
+                    
                 </tr>
 
             </thead>
@@ -80,6 +86,7 @@ else
             </tbody>
 
             <button type="submit">Submit</button>
+            
 
         </table>
     </div>
@@ -88,36 +95,64 @@ else
 
 
 <script>
-    function showMeasuringKeys(templateId, keys) {
+    function showMeasuringKeys(templateId, keys,remarks,amount) {
         const tableBody = document.querySelector("#measuringKeysTable tbody");
         tableBody.innerHTML = ""; // Clear previous
-
+    
+        
+    
 
         keys.forEach((key, index) => {
+
+           
+            
+   
             const row = `
                 <tr>
                     <td>${index + 1}</td>
-                    <td>
+                    <td  align="center">
                         ${key}
-                        <input type="hidden" name="keyNames[${index}]" value="${key}" />
+                        <input type="hidden" name="keyNames[${index}]" value="${key}" /> <br />
+                        <label class="form-label" name="Remarks[${index}]" ><b>Remarks : (${remarks[index]})</b></label><br />
+                        <label class="form-label" name="Amount[${index}]" ><b><i> Amount : ${amount[index]}</i> </b></label>
+                        
+                        
                     </td>
                     <td>
-                        <input type="number" name="scores[${index}]" class="form-control" min="0" max="10" required />
+                        <input type="number" name="scores[${index}]"  class="form-control" min="0" max="10" required />
                     </td>
+
+                   
                 </tr>`;
             tableBody.insertAdjacentHTML("beforeend", row);
         });
 
-       @*  keys.forEach((key, index) => {
+    @*  keys.forEach((key, index) => {
             const row = `
                 <tr>
-                   
+
                     <td>${index + 1}</td>
                     <td>${key}</td>
                     <td><input type="number" name="scores[${index}]" class="form-control" min="0" max="10" /></td>
                 </tr>`;
             tableBody.insertAdjacentHTML("beforeend", row);
         }); *@
+
+
+            function calculatePercentage(index) {
+        const input = document.querySelector(`input[name='scores[${index}]']`);
+        const resultCell = document.querySelector(`#ratingPercent_${index}`);
+        input.addEventListener("input", function () {
+            const score = parseFloat(input.value);
+            if (!isNaN(score)) {
+                const percent = (score / 10) * 100;
+                resultCell.innerText = `Rating: ${score} / 10 (${percent.toFixed(0)}%)`;
+            } else {
+                resultCell.innerText = "";
+            }
+        });
+    }
+
 
         document.getElementById("selectedTemplateHeader").style.display = "block";
         document.getElementById("measuringKeysTable").style.display = "table";
@@ -127,3 +162,7 @@ else
 
     }
 </script>
+
+<div>
+    <a asp-action="Index" asp-controller="Employee">Back to Home</a>
+</div>

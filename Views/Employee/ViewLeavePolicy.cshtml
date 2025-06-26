@@ -1,0 +1,25 @@
+﻿@model IEnumerable<ClientLeavePolicy>
+
+<h3>Your Assigned Clients' Leave Policies</h3>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Client</th>
+            <th>Casual Leaves</th>
+            <th>Sick Leaves</th>
+            <th>Privileged Leaves</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var policy in Model)
+        {
+                <tr>
+                    <td>@policy.Client.UserName</td>
+                    <td>@policy.CasualLeaves</td>
+                    <td>@policy.SickLeaves</td>
+                    <td>@policy.PrivilegedLeaves</td>
+                </tr>
+        }
+    </tbody>
+</table>

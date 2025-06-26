@@ -1399,6 +1399,58 @@ public IActionResult DeleteDepartment(int id)
 
         #endregion
 
+        #region ClientLeavePolicy
+        [HttpGet]
+        public async Task<IActionResult> ManageLeavePolicy()
+        {
+            try
+            {
+                var clients = await _userManager.GetUsersInRoleAsync("Client");
+
+                //var clients = _context.Users.Where(u => u.UserName == "Client").ToList();
+                ViewBag.ClientList = new SelectList(clients, "Id", "UserName");
+                return View();
+
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "An error occurred while loading the ManageLeavePolicy page: " + ex.Message);
+                return View();
+            }
+
+        }
+
+        [HttpPost]
+        public IActionResult ManageLeavePolicy(ClientLeavePolicy policy)
+        {
+            //if (ModelState.IsValid)
+            //{
+            try
+            {
+                //var clients = _context.Users.Where(u => u.UserName == "Client").ToList();
+                //ViewBag.ClientList = new SelectList(clients, "Id", "UserName");
+
+                _context.ClientLeavePolicies.Add(policy);
+                _context.SaveChanges();
+                TempData["Message"] = "Leave policy added successfully.";
+                return RedirectToAction("Index");
+
+
+               
+                //return View(policy);
+            }
+
+            //}
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "An error occurred while loading the ManageLeavePolicy page: " + ex.Message);
+                return View();
+            }
+            
+        }
+        #endregion
+
+
         public async Task<List<SelectListItem>> getUserByRoles(string roleName)
         {
             try

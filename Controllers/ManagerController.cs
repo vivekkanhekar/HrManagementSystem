@@ -44,10 +44,82 @@ namespace HrManagementSystem.Controllers
             var options = new DbContextOptionsBuilder<HrDbContext>().UseSqlServer("RSDatabase").Options;
             this._context = dbContext;
         }
-        public IActionResult Index()
+        //public IActionResult Index()
+        //{
+        //    try
+        //    {
+        //        var userId = _userManager.GetUserId(User); // Get logged-in employee's ID
+
+        //        var approvedTimesheets = _context.Timesheets
+        //            .Where(t => /*t.EmployeeId == userId &&*/ t.approval == true)
+        //            .Select(t => new TimesheetEntryViewModel
+        //            {
+        //                Date = t.Date,
+        //                ClientId = t.Client.UserName,
+        //                ProjectId = t.Project.ProjectName,
+        //                ManagerId = t.Manager.UserName,
+        //                HoursWorked = t.HoursWorked,
+        //                Description = t.Description
+        //            })
+        //            .ToList();
+
+        //        return View(approvedTimesheets);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ViewBag.ErrorMessage = "An error occurred while loading the timesheets.";
+        //        return View("Error");
+        //    }
+        //}
+
+        public IActionResult Index(DateTime? startDate, DateTime? endDate, string? clientName, string? searchTerm)
         {
-            return View();
+            try
+            {
+                var userId = _userManager.GetUserId(User);
+
+                var query = _context.Timesheets
+                    .Where(t => t.approval == true)
+                    .AsQueryable();
+
+                if (startDate.HasValue)
+                    query = query.Where(t => t.Date >= startDate.Value);
+
+                if (endDate.HasValue)
+                    query = query.Where(t => t.Date <= endDate.Value);
+
+                if (!string.IsNullOrEmpty(clientName))
+                    query = query.Where(t => t.Client.UserName.Contains(clientName));
+
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    query = query.Where(t =>
+                        t.Project.ProjectName.Contains(searchTerm) ||
+                        t.Manager.UserName.Contains(searchTerm) ||
+                        t.Description.Contains(searchTerm)
+                    );
+                }
+
+                var approvedTimesheets = query
+                    .Select(t => new TimesheetEntryViewModel
+                    {
+                        Date = t.Date,
+                        ClientId = t.Client.UserName,
+                        ProjectId = t.Project.ProjectName,
+                        ManagerId = t.Manager.UserName,
+                        HoursWorked = t.HoursWorked,
+                        Description = t.Description
+                    }).ToList();
+
+                return View(approvedTimesheets);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = "An error occurred while loading the timesheets.";
+                return View("Error");
+            }
         }
+
         [HttpGet]
         public async Task<IActionResult> ViewTimesheets()
         {
@@ -258,7 +330,7 @@ namespace HrManagementSystem.Controllers
                 {
                     Value = r.ClientId.ToString(),
                     Text = r.Client.UserName
-                }).ToList();
+                }).Distinct().ToList();
                 ViewBag.Client = ClientList;
 
                 var ActivityList = _context.Activities.Select(r => new SelectListItem
@@ -304,14 +376,42 @@ namespace HrManagementSystem.Controllers
                     worksheet.Cells[1, 1].Value = "Department Name";
                     worksheet.Cells[1, 2].Value = "Activity Name";
                     worksheet.Cells[1, 3].Value = "Client Name";
+
+                    // Headers
                     worksheet.Cells[1, 4].Value = "Measuring Key 1";
-                    worksheet.Cells[1, 5].Value = "Measuring Key 2";
-                    worksheet.Cells[1, 6].Value = "Measuring Key 3";
-                    worksheet.Cells[1, 7].Value = "Measuring Key 4";
-                    worksheet.Cells[1, 8].Value = "Measuring Key 5";
+                    worksheet.Cells[1, 5].Value = "Remark 1";
+                    worksheet.Cells[1, 6].Value = "Amount 1";
+                    worksheet.Cells[1, 7].Value = "Measuring Key 2";
+                    worksheet.Cells[1, 8].Value = "Remark 2";
+                    worksheet.Cells[1, 9].Value = "Amount 2";
+                    worksheet.Cells[1, 10].Value = "Measuring Key 3";
+                    worksheet.Cells[1, 11].Value = "Remark 3";
+                    worksheet.Cells[1, 12].Value = "Amount 3";
+                    worksheet.Cells[1, 13].Value = "Measuring Key 4";
+                    worksheet.Cells[1, 14].Value = "Remark 4";
+                    worksheet.Cells[1, 15].Value = "Amount 4";
+                    worksheet.Cells[1, 16].Value = "Measuring Key 5";
+                    worksheet.Cells[1, 17].Value = "Remark 5";
+                    // ...
+                    worksheet.Cells[1, 18].Value = "Amount 5";
+
+                    int col = 4;
+                    for (int i = 0; i < 5; i++)
+                    {
+                        worksheet.Cells[2, col++].Value = template.MeasuringKeys[i];
+                        worksheet.Cells[2, col++].Value = template.Remarks[i];
+                        worksheet.Cells[2, col++].Value = template.Amount[i];
+                    }
+
+                    //worksheet.Cells[1, 4].Value = "Measuring Key 1";
+                    //worksheet.Cells[1, 5].Value = "Measuring Key 2";
+                    //worksheet.Cells[1, 6].Value = "Measuring Key 3";
+                    //worksheet.Cells[1, 7].Value = "Measuring Key 4";
+                    //worksheet.Cells[1, 8].Value = "Measuring Key 5";
+                    //worksheet.Cells[1, 9].Value = "Remarks";
 
                     // Header style
-                    using (var range = worksheet.Cells[1, 1, 1, 8])
+                    using (var range = worksheet.Cells[1, 1, 1, 18])
                     {
                         range.Style.Fill.PatternType = ExcelFillStyle.Solid;
                         range.Style.Fill.BackgroundColor.SetColor(Color.LightSkyBlue);
@@ -325,11 +425,11 @@ namespace HrManagementSystem.Controllers
                     worksheet.Cells[2, 1].Value = dept?.Name ?? "N/A";
                     worksheet.Cells[2, 2].Value = activity?.ActivityName ?? "N/A";
                     worksheet.Cells[2, 3].Value = client?.FirstName ?? "N/A";
-
-                    for (int i = 0; i < 5; i++)
-                    {
-                        worksheet.Cells[2, 4 + i].Value = template.MeasuringKeys[i];
-                    }
+                    //worksheet.Cells[2, 9].Value = template.Remarks ?? "N/A";
+                    //for (int i = 0; i < 5; i++)
+                    //{
+                    //    worksheet.Cells[2, 4 + i].Value = template.MeasuringKeys[i];
+                    //}
 
                     package.SaveAs(new FileInfo(filePath));
                 }
@@ -344,6 +444,8 @@ namespace HrManagementSystem.Controllers
                     CreatedDate = DateTime.Now,
                     DepartmentId = template.DepartmentId,
                     FileName = fileName,
+                    Remarks = template.Remarks,
+                    Amount = template.Amount,
                     FilePath = Path.Combine("AppraisalTemplate", fileName)
                 };
 
@@ -366,6 +468,15 @@ namespace HrManagementSystem.Controllers
             return View(template);
         }
 
+        public async Task<IActionResult> ViewAppraisals()
+        {
+            var appraisals = await _context.appraisalResponses
+                //.Include(a => a.KeyEntries) 
+                .Include(a => a.Employee) 
+                .ToListAsync();
+
+            return View(appraisals);
+        }
         //[HttpPost]
         //public async Task<IActionResult> CreateAppraisalTemplate([FromForm] IFormFile file, AppraisalTemplate template)
         //{

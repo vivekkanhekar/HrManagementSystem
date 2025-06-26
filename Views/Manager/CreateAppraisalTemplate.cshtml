@@ -58,7 +58,7 @@
 
  *@
 
-                <div class="form-group">
+               @*  <div class="form-group">
                     <label for="Measuring Keys">Measuring Keys</label>
                     <input type="text" id="MeasuringKeys" name="MeasuringKeys" asp-for="MeasuringKeys[0]" class="form-control" required />
                 </div>
@@ -84,9 +84,40 @@
                     <input type="text" id="Measuring Keys" name="MeasuringKeys" asp-for="MeasuringKeys[4]" class="form-control" required />
                 </div>
 
+
+                 <div class="mb-3">
+        <label>Remarks (optional)</label>
+        <textarea asp-for="Remarks" class="form-control"></textarea>
+    </div> *@
+
+
+    @for (int i = 0; i < 5; i++)
+{
+    <div class="form-group">
+        <label>Measuring Key @(@i + 1)</label>
+        <input type="text" name="MeasuringKeys[@i]" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label>Remark @(@i + 1) (optional)</label>
+        <input type="text" name="Remarks[@i]" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Amount @(@i + 1)</label>
+        <input type="number" name="Amount[@i]" class="form-control" step="0.01" />
+    </div>
+}
+
+                @*  <div class="form-group">
+                    <label for="Measuring Keys"> Remarks</label>
+                    <input type="text" id="Remarks " name="Remarks" asp-for="Remarks" class="form-control" required />
+                </div> *@
                 <button type="submit" class="btn btn-success">Create Template</button>
             </td>
         </tr>
     </table>
    
 </form>
+
+                    <div>
+    <a asp-action="Index" asp-controller="Manager">Back to Home</a>
+</div

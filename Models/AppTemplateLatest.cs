@@ -25,6 +25,8 @@ namespace HrManagementSystem.Models
         public string? FileName { get; set; }
         public List<string> MeasuringKeys { get; set; }
 
+        public List<string> Remarks { get; set; }
+        public List<string> Amount { get; set; }
 
         [ForeignKey("ManagerId")]
         public User Manager { get; set; }

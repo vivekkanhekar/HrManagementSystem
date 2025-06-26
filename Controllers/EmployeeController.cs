@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Security.Claims;
 //using static HrManagementSystem.Models.Timesheet;
 
@@ -41,24 +42,73 @@ namespace HrManagementSystem.Controllers
         //{
         //    return View();
         //}
-        public IActionResult Index()
+        //public IActionResult Index()
+        //{
+        //    try
+        //    {
+        //        var userId = _userManager.GetUserId(User); // Get logged-in employee's ID
+
+        //        var approvedTimesheets = _context.Timesheets
+        //            .Where(t => /*t.EmployeeId == userId &&*/ t.approval == true)
+        //            .Select(t => new TimesheetEntryViewModel
+        //            {
+        //                Date = t.Date,
+        //                ClientId = t.Client.UserName,
+        //                ProjectId = t.Project.ProjectName,
+        //                ManagerId = t.Manager.UserName,
+        //                HoursWorked = t.HoursWorked,
+        //                Description = t.Description
+        //            })
+        //            .ToList();
+
+        //        return View(approvedTimesheets);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ViewBag.ErrorMessage = "An error occurred while loading the timesheets.";
+        //        return View("Error");
+        //    }
+
+        //}
+
+        public IActionResult Index(DateTime? startDate, DateTime? endDate, string? clientName, string? searchTerm)
         {
             try
             {
-                var userId = _userManager.GetUserId(User); // Get logged-in employee's ID
+                var userId = _userManager.GetUserId(User);
 
-                var approvedTimesheets = _context.Timesheets
-                    .Where(t => /*t.EmployeeId == userId &&*/ t.approval == true)
+                var query = _context.Timesheets
+                    .Where(t => t.approval == true)
+                    .AsQueryable();
+
+                if (startDate.HasValue)
+                    query = query.Where(t => t.Date >= startDate.Value);
+
+                if (endDate.HasValue)
+                    query = query.Where(t => t.Date <= endDate.Value);
+
+                if (!string.IsNullOrEmpty(clientName))
+                    query = query.Where(t => t.Client.UserName.Contains(clientName));
+
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    query = query.Where(t =>
+                        t.Project.ProjectName.Contains(searchTerm) ||
+                        t.Manager.UserName.Contains(searchTerm) ||
+                        t.Description.Contains(searchTerm)
+                    );
+                }
+
+                var approvedTimesheets = query
                     .Select(t => new TimesheetEntryViewModel
                     {
                         Date = t.Date,
-                        ClientId = t.Client.Email,
+                        ClientId = t.Client.UserName,
                         ProjectId = t.Project.ProjectName,
                         ManagerId = t.Manager.UserName,
                         HoursWorked = t.HoursWorked,
                         Description = t.Description
-                    })
-                    .ToList();
+                    }).ToList();
 
                 return View(approvedTimesheets);
             }
@@ -67,20 +117,52 @@ namespace HrManagementSystem.Controllers
                 ViewBag.ErrorMessage = "An error occurred while loading the timesheets.";
                 return View("Error");
             }
-
         }
+
+        #region  LeavePolicy
+        public IActionResult ViewLeavePolicy()
+        {
+            var empId = _userManager.GetUserId(User);
+
+            // Step 1: Get the client(s) assigned to this employee
+            var assignedClientIds = _context.EmployeeClientAssignments
+                .Where(e => e.EmployeeId == empId)
+                .Select(e => e.ClientId)
+                .ToList();
+
+            // Step 2: Get leave policies ONLY for those clients
+            var policies = _context.ClientLeavePolicies
+                .Where(lp => assignedClientIds.Contains(lp.ClientID))
+                .Include(lp => lp.Client)
+                .ToList();
+
+            return View(policies);
+        }
+        #endregion
 
         #region Timesheet crud
         [HttpGet]
-        public IActionResult CreateTimesheet()
+        public async Task<IActionResult> CreateTimesheet()
         {
             try
             {
+                //var model = new WeeklyTimesheetViewModel
+                //{
+                //    Clients = _context.Timesheets.Select(c => new SelectListItem { Value = c.ClientId.ToString(), Text = c.Client.UserName }).ToList(),
+                //    Projects = _context.Project.Select(p => new SelectListItem { Value = p.ProjectId.ToString(), Text = p.ProjectName }).ToList(),
+                //    ManagerID = _context.Timesheets.Select(m => new SelectListItem { Value = m.ManagerID.ToString(), Text = m.Manager.UserName }).ToList(),
+
+                //    ActivityTasks = _context.Activities.Select(a => new SelectListItem { Value = a.ActivityId.ToString(), Text = a.ActivityName }).ToList()
+                //};
+                //return View(model);
+                var clientList = await _userManager.GetUsersInRoleAsync("Client");
+                var managerList = await _userManager.GetUsersInRoleAsync("Manager");
                 var model = new WeeklyTimesheetViewModel
                 {
-                    Clients = _context.Timesheets.Select(c => new SelectListItem { Value = c.ClientId.ToString(), Text = c.Client.UserName }).ToList(),
+                    Clients = clientList.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.FirstName }).ToList(), // _context.Timesheets.Select(c => new SelectListItem { Value = c.ClientId.ToString(), Text = c.Client.UserName }).ToList(),
                     Projects = _context.Project.Select(p => new SelectListItem { Value = p.ProjectId.ToString(), Text = p.ProjectName }).ToList(),
-                    ManagerID = _context.Timesheets.Select(m => new SelectListItem { Value = m.ManagerID.ToString(), Text = m.Manager.UserName }).ToList(),
+                    ManagerID = managerList.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.FirstName }).ToList(),
+
 
                     ActivityTasks = _context.Activities.Select(a => new SelectListItem { Value = a.ActivityId.ToString(), Text = a.ActivityName }).ToList()
                 };
@@ -144,6 +226,7 @@ namespace HrManagementSystem.Controllers
 
                 var user = await _userManager.GetUserAsync(User);
                 var clientUsers = await GetUsersInRoleAsync("Client");
+                var managerList = await _userManager.GetUsersInRoleAsync("Manager");
 
                 var selectClientList = clientUsers.Select(u => new SelectListItem
                 {
@@ -158,10 +241,10 @@ namespace HrManagementSystem.Controllers
                 }).ToList();
                 ViewBag.Project = ProjectList;
 
-                var ManagerList = _context.Timesheets.Select(r => new SelectListItem
+                var ManagerList = managerList.Select(r => new SelectListItem
                 {
-                    Value = r.ManagerID.ToString(),
-                    Text = r.Manager.UserName
+                    Value = r.Id.ToString(),
+                    Text = r.UserName
                 }).ToList();
                 ViewBag.Manager = ManagerList;
 
@@ -177,6 +260,7 @@ namespace HrManagementSystem.Controllers
                     Date = timesheet.Date,
                     ClientId = timesheet.ClientId,
                     ProjectId = timesheet.ProjectId,
+                    ManagerId=timesheet.ManagerID,
                     ActivityId = timesheet.ActivityId,
                     HoursWorked = timesheet.HoursWorked,
                     Description = timesheet.Description,
@@ -344,7 +428,7 @@ namespace HrManagementSystem.Controllers
                 if (!assignedClientIds.Any())
                 {
                     ViewBag.Message = "No clients assigned.";
-                    return View(new List<AppraisalTemplate>());
+                    return View(new List<AppTemplateLatest>());
                 }
 
                 var templates = _context.appraisalTemplatesLatest
@@ -353,6 +437,8 @@ namespace HrManagementSystem.Controllers
                     .Include(t => t.Manager)
                     .Include(t => t.Department)
                     .Include(t => t.Activity)
+                    //.Include(t => t.Remarks)
+                    //.Include(t => t.Amount)
                     .ToList();
 
                 if (!templates.Any())
@@ -371,7 +457,7 @@ namespace HrManagementSystem.Controllers
         }
 
         [HttpPost]
-        public IActionResult SubmitAppraisal(int templateId, string[] selfAssessment)
+        public IActionResult SubmitAppraisal(int templateId, string[] selfAssessment,string[] remark)
         {
             try
             {
@@ -393,20 +479,43 @@ namespace HrManagementSystem.Controllers
             }
 
         }
+
+       
+
         [HttpPost]
-        public IActionResult Appraisals(int templateId, string[] keyNames, string[] scores)
+        public IActionResult Appraisals(int templateId, string[] keyNames, string[] scores, string remark,string amount)
         {
             try
             {
                 var employeeId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
+                var remarkList=new List<string>();
+                var amountList = new List<string>();
                 var keyEntryList = new List<string>();
+
+                var ratingPercents = new List<string>();
+
                 for (int i = 0; i < keyNames.Length; i++)
                 {
-                    keyEntryList.Add($"{keyNames[i]}:{scores[i]}");
+                    double score = double.Parse(scores[i]);
+                    double percent = (score / 10.0) * 100;
+                    keyEntryList.Add($"{keyNames[i]}:{scores[i]}:{remark[i]}:{amount[i]}:{percent}%");
+                    ratingPercents.Add($"{percent}%");
                 }
 
-                var joinedKeyEntries = string.Join(", ", keyEntryList);
+                for (int i = 0; i < keyNames.Length; i++)
+                {
+                    keyEntryList.Add($"{keyNames[i]}:{scores[i]}:{remark[i]}:{amount[i]}");
+                }
+
+                for (int i = 0; i < remark.Length; i++)
+                {
+                    remarkList.Add($"{remark[i]}");
+                }
+                for(int i = 0; i < amount.Length; i++)
+                {
+                    amountList.Add($"{amount[i]}");
+                }
+                var joinedKeyEntries = string.Join(", ", keyEntryList,remarkList,amountList);
 
                 var existing = _context.appraisalResponses
                     .FirstOrDefault(x => x.Template.Id == templateId && x.EmployeeId == employeeId);
@@ -423,7 +532,12 @@ namespace HrManagementSystem.Controllers
                     AppraisalTemplateId = templateId,
                     EmployeeId = employeeId,
                     KeyEntries = keyEntryList,
-                    SubmittedDate = DateTime.Now
+                    Remarks = remarkList,
+                    Amount = amountList,
+                    SubmittedDate = DateTime.Now,
+
+
+                    //Remarks = remark,
                 };
 
                 _context.appraisalResponses.Add(appraisalentry);
@@ -438,6 +552,82 @@ namespace HrManagementSystem.Controllers
                 return View("Error");
             }
 
+        }
+        [HttpGet]
+        public IActionResult MyAppraisals()
+        {
+            var empId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var responses = _context.appraisalResponses
+                                    .Where(r => r.EmployeeId == empId)
+                                    .ToList();
+            return View(responses);
+        }
+        [HttpGet]
+       
+        public IActionResult EditAppraisal(int id)
+        {
+            var empId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var response = _context.appraisalResponses.FirstOrDefault(r => r.Id == id && r.EmployeeId == empId);
+            if (response == null)
+                return NotFound();
+
+            return View(response);
+        }
+        [HttpPost]
+        public IActionResult EditAppraisal(int Id, string[] KeyLabels, string[] ScoreInputs)
+        {
+            var existing = _context.appraisalResponses.FirstOrDefault(r => r.Id == Id);
+            if (existing != null)
+            {
+                var updatedEntries = new List<string>();
+                for (int i = 0; i < KeyLabels.Length; i++)
+                {
+                    updatedEntries.Add($"{KeyLabels[i]}:{ScoreInputs[i]}");
+                }
+
+                existing.KeyEntries = updatedEntries; 
+                existing.SubmittedDate = DateTime.Now;
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction("MyAppraisals");
+        }
+
+
+        //[HttpPost]
+        //public IActionResult EditAppraisal(AppraisalResponse updatedResponse)
+        //{
+        //    var existing = _context.appraisalResponses.FirstOrDefault(r => r.Id == updatedResponse.Id);
+        //    if (existing != null)
+        //    {
+        //        existing.AppraisalTemplateId = updatedResponse.AppraisalTemplateId;
+        //        _context.SaveChanges();
+        //    }
+        //    return RedirectToAction("MyAppraisals");
+        //}
+
+        [HttpGet]
+        public IActionResult DeleteAppraisal(int id)
+        {
+            var empId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var response = _context.appraisalResponses.FirstOrDefault(r => r.Id == id && r.EmployeeId == empId);
+            if (response == null)
+                return NotFound();
+
+            return View(response);
+        }
+
+       
+        [HttpPost]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            var response = _context.appraisalResponses.FirstOrDefault(r => r.Id == id);
+            if (response != null)
+            {
+                _context.appraisalResponses.Remove(response);
+                _context.SaveChanges();
+            }
+            return RedirectToAction("MyAppraisals");
         }
 
 

@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace HrManagementSystem.Data
 {
@@ -18,11 +19,11 @@ namespace HrManagementSystem.Data
 
         public DbSet<Projects> Project { get; set; }
         public DbSet<Timesheet> Timesheets { get; set; }
+        public DbSet<ClientLeavePolicy> ClientLeavePolicies { get; set; }
 
-  
         //public DbSet<Approval> Approvals { get; set; }
         public DbSet<Role> Roles { get; set; }
-       // public DbSet<TimesheetEmployee> TimesheetEmployee { get; set; }
+        // public DbSet<TimesheetEmployee> TimesheetEmployee { get; set; }
 
         public DbSet<Department> Departments { get; set; }
         public DbSet<EmployeeClientAssignment> EmployeeClientAssignments { get; set; }
@@ -68,6 +69,19 @@ namespace HrManagementSystem.Data
                 .WithMany()
                 .HasForeignKey(t => t.ClientId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder.Entity<AppTemplateLatest>()
+.Property(s => s.Amount)
+ .HasConversion(
+v => JsonConvert.SerializeObject(v),
+v => JsonConvert.DeserializeObject<List<string>>(v));
+
+            modelBuilder.Entity<AppTemplateLatest>()
+.Property(s => s.Remarks)
+.HasConversion(
+v => JsonConvert.SerializeObject(v),
+v => JsonConvert.DeserializeObject<List<string>>(v));
 
 
 

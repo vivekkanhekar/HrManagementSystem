@@ -4,6 +4,7 @@ using HrManagementSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HrManagementSystem.Migrations
 {
     [DbContext(typeof(HrDbContext))]
-    partial class HrDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250613103301_responceremark")]
+    partial class responceremark
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,10 +61,6 @@ namespace HrManagementSystem.Migrations
 
                     b.Property<int>("ActivityId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Amount")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClientId")
                         .IsRequired()
@@ -112,10 +111,6 @@ namespace HrManagementSystem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AmountEntriesCsv")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("AppraisalTemplateId")
                         .HasColumnType("int");
 
@@ -127,7 +122,7 @@ namespace HrManagementSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RemarkEntriesCsv")
+                    b.Property<string>("Remarks")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -141,37 +136,6 @@ namespace HrManagementSystem.Migrations
                     b.HasIndex("EmployeeId");
 
                     b.ToTable("appraisalResponses");
-                });
-
-            modelBuilder.Entity("HrManagementSystem.Models.ClientLeavePolicy", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CasualLeaves")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ClientID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("MaternityLeaves")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PrivilegedLeaves")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SickLeaves")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClientID");
-
-                    b.ToTable("ClientLeavePolicies");
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.Department", b =>
@@ -610,17 +574,6 @@ namespace HrManagementSystem.Migrations
                     b.Navigation("Employee");
 
                     b.Navigation("Template");
-                });
-
-            modelBuilder.Entity("HrManagementSystem.Models.ClientLeavePolicy", b =>
-                {
-                    b.HasOne("HrManagementSystem.Models.User", "Client")
-                        .WithMany()
-                        .HasForeignKey("ClientID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Client");
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.EmployeeClientAssignment", b =>

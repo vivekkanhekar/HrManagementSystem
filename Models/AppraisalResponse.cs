@@ -18,11 +18,26 @@ namespace HrManagementSystem.Models
 
         //public string SelfAssessment { get; set; }
         //public virtual List<SelfAssessment> Entries { get; set; }
+        public string AmountEntriesCsv { get; set; } // Stored in DB
+        [NotMapped]
+        public IList<string> Amount  // its a list of string not entity you cant include
+        {
+            get => AmountEntriesCsv?.Split(';')?.ToList() ?? new List<string>();
+            set => AmountEntriesCsv = string.Join(";", value);
+        }
+        public string RemarkEntriesCsv { get; set; } // Stored in DB
+
+        [NotMapped]
+        public IList<string> Remarks  // its a list of string not entity you cant include
+        {
+            get => RemarkEntriesCsv?.Split(';')?.ToList() ?? new List<string>();
+            set => RemarkEntriesCsv = string.Join(";", value);
+        }
 
         public string KeyEntriesCsv { get; set; } // Stored in DB
 
         [NotMapped]
-        public IList<string> KeyEntries
+        public IList<string> KeyEntries  // its a list of string not entity you cant include
         {
             get => KeyEntriesCsv?.Split(';')?.ToList() ?? new List<string>();
             set => KeyEntriesCsv = string.Join(";", value);

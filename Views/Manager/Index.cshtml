@@ -1,12 +1,79 @@
-﻿
+﻿ @model List<HrManagementSystem.Models.TimesheetEntryViewModel>
 @*  @model Timesheet
  *@
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    // Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Index";
 }
 
-<h2>Welcome Manager</h2>
+
+
+<h1>Welcome Manager</h1>
+
+<h2 class="mt-4">Submitted Timesheets</h2>
+
+<form asp-action="Index" method="get" class="row g-3 mb-4">
+    <div class="col-md-2">
+        <label class="form-label">Start Date</label>
+        <input type="date" name="startDate" class="form-control" value="@Context.Request.Query["startDate"]" />
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">End Date</label>
+        <input type="date" name="endDate" class="form-control" value="@Context.Request.Query["endDate"]" />
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">Client Name</label>
+        <input type="text" name="clientName" class="form-control" placeholder="Enter client name" value="@Context.Request.Query["clientName"]" />
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">Search (Project, Manager, Description)</label>
+        <input type="text" name="searchTerm" class="form-control" placeholder="Search..." value="@Context.Request.Query["searchTerm"]" />
+    </div>
+
+    <div class="col-md-3 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a href="@Url.Action("Index")" class="btn btn-secondary ms-2">Reset</a>
+    </div>
+</form>
+
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Client</th>
+                <th>Project</th>
+                <th>Manager</th>
+                <th>Hours</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Date.ToString("dd-MM-yyyy")</td>
+                    <td>@item.ClientId</td>
+                    <td>@item.ProjectId</td>
+                    <td>@item.ManagerId</td>
+                    <td>@item.HoursWorked</td>
+                    <td>@item.Description</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No Submitted timesheets found.</p>
+}
+
+
 
 <div class="tableContent" align="center">
     <div class="col-md-4 w-50 d-grid align-content-center">
@@ -30,6 +97,10 @@
                 </td>
                 <td>
                     <a asp-controller="Manager" asp-action="CreateAppraisalTemplate" class="btn btn-success">Create Appraisal STemplate </a>
+
+                </td>
+                <td>
+                    <a asp-controller="Manager" asp-action="ViewAppraisals" class="btn btn-info"> View Appraisals</a>
 
                 </td>
             </tr>

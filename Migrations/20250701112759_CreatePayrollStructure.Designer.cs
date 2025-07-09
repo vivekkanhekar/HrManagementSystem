@@ -4,6 +4,7 @@ using HrManagementSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HrManagementSystem.Migrations
 {
     [DbContext(typeof(HrDbContext))]
-    partial class HrDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250701112759_CreatePayrollStructure")]
+    partial class CreatePayrollStructure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -251,32 +254,6 @@ namespace HrManagementSystem.Migrations
                     b.ToTable("EmployeeClientAssignments");
                 });
 
-            modelBuilder.Entity("HrManagementSystem.Models.EmployeeLeave", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("EmpOffId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EmployeeOffDetailsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LeaveTypeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeOffDetailsId");
-
-                    b.HasIndex("LeaveTypeId");
-
-                    b.ToTable("EmployeeLeaves");
-                });
-
             modelBuilder.Entity("HrManagementSystem.Models.EmployeeOffDetails", b =>
                 {
                     b.Property<int>("Id")
@@ -292,24 +269,9 @@ namespace HrManagementSystem.Migrations
                     b.Property<int>("DesignationId")
                         .HasColumnType("int");
 
-                    b.Property<string>("EPFNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ESIEnrollmentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ESINumber")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("EmployeeId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("HasESI")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("HasPF")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("IsBillable")
                         .HasColumnType("bit");
@@ -322,15 +284,6 @@ namespace HrManagementSystem.Migrations
 
                     b.Property<string>("PAN")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("PFEnrollmentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PFNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PF_UAN")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -359,29 +312,6 @@ namespace HrManagementSystem.Migrations
                     b.HasKey("JobTypeId");
 
                     b.ToTable("JobTypes");
-                });
-
-            modelBuilder.Entity("HrManagementSystem.Models.LeaveType", b =>
-                {
-                    b.Property<int>("Leave_Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Leave_Id"));
-
-                    b.Property<int>("DaysAllowed")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LeaveName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Leave_Id");
-
-                    b.ToTable("LeaveTypes");
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.Projects", b =>
@@ -800,25 +730,6 @@ namespace HrManagementSystem.Migrations
                     b.Navigation("Manager");
                 });
 
-            modelBuilder.Entity("HrManagementSystem.Models.EmployeeLeave", b =>
-                {
-                    b.HasOne("HrManagementSystem.Models.EmployeeOffDetails", "EmployeeOffDetails")
-                        .WithMany("EmployeeLeaves")
-                        .HasForeignKey("EmployeeOffDetailsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HrManagementSystem.Models.LeaveType", "LeaveType")
-                        .WithMany("EmployeeLeaves")
-                        .HasForeignKey("LeaveTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("EmployeeOffDetails");
-
-                    b.Navigation("LeaveType");
-                });
-
             modelBuilder.Entity("HrManagementSystem.Models.EmployeeOffDetails", b =>
                 {
                     b.HasOne("HrManagementSystem.Models.Designation", "Designation")
@@ -945,19 +856,9 @@ namespace HrManagementSystem.Migrations
                     b.Navigation("Employees");
                 });
 
-            modelBuilder.Entity("HrManagementSystem.Models.EmployeeOffDetails", b =>
-                {
-                    b.Navigation("EmployeeLeaves");
-                });
-
             modelBuilder.Entity("HrManagementSystem.Models.JobType", b =>
                 {
                     b.Navigation("Employees");
-                });
-
-            modelBuilder.Entity("HrManagementSystem.Models.LeaveType", b =>
-                {
-                    b.Navigation("EmployeeLeaves");
                 });
 #pragma warning restore 612, 618
         }

@@ -1451,6 +1451,75 @@ public IActionResult DeleteDepartment(int id)
         #endregion
 
 
+        #region Payroll Process
+       
+        [HttpGet]
+        public async Task<IActionResult> EnterOfficialDetails(string employeeId)
+        {
+            try
+            {
+                var model = new EmployeeOffDetailsViewModel
+                {
+                    Details = new EmployeeOffDetails { EmployeeId = employeeId },
+                    Employees = (List<User>)await _userManager.GetUsersInRoleAsync("Employee"),
+                    JobTypes = _context.JobTypes.ToList(),
+                    Designations = _context.Designations.ToList(),
+                    LeaveTypes = _context.LeaveTypes.ToList()
+                };
+
+                return View(model);
+            }
+
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "An error occurred while loading the  Employee page: " + ex.Message);
+                return View(new User());
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EnterOfficialDetails(EmployeeOffDetails details)
+        {
+
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    //var vm = new EmployeeOffDetailsViewModel
+                    //{
+                    //    Details = details,
+                    //    Employees = (List<User>)await _userManager.GetUsersInRoleAsync("Employee"),
+                    //    JobTypes = _context.JobTypes.ToList(),
+                    //    Designations = _context.Designations.ToList()
+                    //};
+
+                    //_context.EmployeeOffDetails.Add(details);
+                    //await _context.SaveChangesAsync();
+                    //return RedirectToAction("Index", "Home");
+                }
+                
+               // return View(vm);
+
+
+
+                _context.EmployeeOffDetails.Add(details);
+                await _context.SaveChangesAsync();
+                TempData["Message"] = "Employee official details saved.";
+
+                return RedirectToAction("Index");
+            }
+
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "An error occurred while loading the EnterOfficialDetails page: " + ex.Message);
+                return View();
+            }
+            // Reload dropdowns on error
+
+        }
+
+        #endregion
+
         public async Task<List<SelectListItem>> getUserByRoles(string roleName)
         {
             try

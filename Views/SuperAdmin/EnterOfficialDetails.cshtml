@@ -1,0 +1,130 @@
+﻿@model HrManagementSystem.Models.EmployeeOffDetailsViewModel
+
+@{
+    ViewBag.Title = "Enter Employee Official Details";
+}
+
+<h2 class="mb-4 text-center">Employee Official Details</h2>
+
+<div class="w-75 mx-auto border p-4 rounded">
+    <!-- Section Toggle Buttons -->
+    <div class="mb-3 text-center">
+        <button type="button" class="btn btn-outline-primary me-2" onclick="showSection('officialTable')">Official Info</button>
+        <button type="button" class="btn btn-outline-primary me-2" onclick="showSection('pfTable')">PF Details</button>
+        <button type="button" class="btn btn-outline-primary me-2" onclick="showSection('esiTable')">ESI Details</button>
+        <button type="button" class="btn btn-outline-primary" onclick="showSection('leaveTable')">Leave Allocation</button>
+    </div>
+
+    <form asp-action="EnterOfficialDetails" method="post">
+        <!-- Official Info Table -->
+        <table id="officialTable" class="table table-bordered mb-4">
+            <tr>
+                <td><label>Employee</label></td>
+                <td>
+                    <select asp-for="Details.EmployeeId" asp-items="@(new SelectList(Model.Employees, "Id", "UserName"))" class="form-control">
+                        <option value="">-- Select Employee --</option>
+                    </select>
+                    <span asp-validation-for="Details.EmployeeId" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr><td>PAN</td><td><input asp-for="Details.PAN" class="form-control" /></td></tr>
+            <tr><td>Joining Date</td><td><input asp-for="Details.JoiningDate" type="date" class="form-control" /></td></tr>
+            <tr><td>Account Number</td><td><input asp-for="Details.AccountNumber" class="form-control" /></td></tr>
+            <tr>
+                <td>Job Type</td>
+                <td>
+                    <select asp-for="Details.JobTypeId" asp-items="@(new SelectList(Model.JobTypes, "JobTypeId", "Name"))" class="form-control"></select>
+                </td>
+            </tr>
+            <tr>
+                <td>Designation</td>
+                <td>
+                    <select asp-for="Details.DesignationId" asp-items="@(new SelectList(Model.Designations, "DesignationId", "Title"))" class="form-control"></select>
+                </td>
+            </tr>
+            <tr>
+                <td>Billable</td>
+                <td>
+                    <select asp-for="Details.IsBillable" class="form-control">
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+
+        <!-- PF Table -->
+        <table id="pfTable" class="table table-bordered mb-4" style="display:none;">
+            <tr><td>Has PF</td><td><select asp-for="Details.HasPF" class="form-control"><option value="false">No</option><option value="true">Yes</option></select></td></tr>
+            <tr><td>PF UAN</td><td><input asp-for="Details.PF_UAN" class="form-control" /></td></tr>
+            <tr><td>PF Number</td><td><input asp-for="Details.PFNumber" class="form-control" /></td></tr>
+            <tr><td>PF Enrollment Date</td><td><input asp-for="Details.PFEnrollmentDate" type="date" class="form-control" /></td></tr>
+            <tr><td>EPF Number</td><td><input asp-for="Details.EPFNumber" class="form-control" /></td></tr>
+        </table>
+
+        <!-- ESI Table -->
+        <table id="esiTable" class="table table-bordered mb-4" style="display:none;">
+            <tr><td>Has ESI</td><td><select asp-for="Details.HasESI" class="form-control"><option value="false">No</option><option value="true">Yes</option></select></td></tr>
+            <tr><td>ESI Number</td><td><input asp-for="Details.ESINumber" class="form-control" /></td></tr>
+            <tr><td>ESI Enrollment Date</td><td><input asp-for="Details.ESIEnrollmentDate" type="date" class="form-control" /></td></tr>
+        </table>
+
+        <!-- Leave Table -->
+        @* <table id="leaveTable" class="table table-bordered mb-4" style="display:none;">
+            <tr>
+                <td>Leave Type</td>
+                <td>
+                    <select asp-for="Details.EmployeeLeaves" asp-items="@(new SelectList(Model.LeaveTypes, "Leave_Id", "LeaveName"))" class="form-control">
+                        <option value="">-- Select Leave Type --</option>
+                    </select>
+                </td>
+            </tr>
+        </table> *@
+
+        <!-- Leave Details Table -->
+        <table id="leaveTable" class="table table-bordered mb-4">
+            <thead class="table-light">
+                <tr>
+                    <th>Select</th>
+                    <th>Leave Type</th>
+                    <th>Opening Balance</th>
+                    <th>Accrued Leave</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.LeaveTypes.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="SelectedLeaveTypes[@i].IsSelected" value="true" @(Model.SelectedLeaveTypes?[i].IsSelected == true ? "checked" : "") />
+                            <input type="hidden" name="SelectedLeaveTypes[@i].Leave_Id" value="@Model.LeaveTypes[i].Leave_Id" />
+                        </td>
+                        <td>@Model.LeaveTypes[i].LeaveName</td>
+                        <td>
+                            <input type="number" name="SelectedLeaveTypes[@i].OpeningBalance" value="@(Model.SelectedLeaveTypes?[i].OpeningBalance ?? 0)" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="number" name="SelectedLeaveTypes[@i].AccruedLeave" value="@(Model.SelectedLeaveTypes?[i].AccruedLeave ?? 0)" class="form-control" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-success w-100 mt-3">Save Official Details</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function showSection(id) {
+            $('#officialTable, #pfTable, #esiTable, #leaveTable').hide();
+            $('#' + id).show();
+        }
+        $(document).ready(() => showSection('officialTable'));
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

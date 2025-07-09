@@ -30,8 +30,11 @@ namespace HrManagementSystem.Data
         //public DbSet<AppraisalTemplate> appraisalTemplates { get; set; }
         public DbSet<AppTemplateLatest> appraisalTemplatesLatest { get; set; }
         public DbSet<AppraisalResponse> appraisalResponses { get; set; }
-
-
+        public DbSet<JobType> JobTypes { get; set; }
+        public DbSet<Designation> Designations { get; set; }
+        public DbSet<EmployeeOffDetails> EmployeeOffDetails { get; set; }
+        public DbSet<LeaveType> LeaveTypes { get; set; }
+        public DbSet<EmployeeLeave> EmployeeLeaves { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder); // Apply Identity configurations
@@ -51,6 +54,14 @@ namespace HrManagementSystem.Data
             {
                 entity.HasKey(e => new { e.UserId, e.LoginProvider, e.Name });
             });
+
+//            modelBuilder.Entity<JobType>().HasData(
+//    new JobType { JobTypeId = 1, Name = "Permanent" },
+//    new JobType { JobTypeId = 2, Name = "Contract" },
+//    new JobType { JobTypeId = 3, Name = "Freelancer" },
+//    new JobType { JobTypeId = 4, Name = "Consultant" },
+//    new JobType { JobTypeId = 5, Name = "Probation" }
+//);
 
             modelBuilder.Entity<Timesheet>()
      .HasOne(t => t.Employee)

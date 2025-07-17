@@ -31,6 +31,13 @@ namespace HrManagementSystem.Data
         public DbSet<AppTemplateLatest> appraisalTemplatesLatest { get; set; }
         public DbSet<AppraisalResponse> appraisalResponses { get; set; }
         public DbSet<JobType> JobTypes { get; set; }
+        public DbSet<AssetType> AssetTypes { get; set; }
+        public DbSet<SalaryComponent> SalaryComponents { get; set; }
+
+
+        public DbSet<EmployeeAsset> EmployeeAssets { get; set; }
+        public DbSet<EmployeeSalary> EmployeeSalaries { get; set; }
+
         public DbSet<Designation> Designations { get; set; }
         public DbSet<EmployeeOffDetails> EmployeeOffDetails { get; set; }
         public DbSet<LeaveType> LeaveTypes { get; set; }

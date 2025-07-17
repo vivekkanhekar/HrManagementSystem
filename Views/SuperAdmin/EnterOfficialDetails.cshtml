@@ -13,6 +13,8 @@
         <button type="button" class="btn btn-outline-primary me-2" onclick="showSection('pfTable')">PF Details</button>
         <button type="button" class="btn btn-outline-primary me-2" onclick="showSection('esiTable')">ESI Details</button>
         <button type="button" class="btn btn-outline-primary" onclick="showSection('leaveTable')">Leave Allocation</button>
+        <button type="button" class="btn btn-outline-primary me-2" onclick="showSection('assetTable')">Other Info</button>
+        <button type="button" class="btn btn-outline-primary me-2" onclick="showSection('salaryTable')">Salary Details</button>
     </div>
 
     <form asp-action="EnterOfficialDetails" method="post">
@@ -111,6 +113,160 @@
             </tbody>
         </table>
 
+
+        <!-- Other Info: Asset Allocation (Single Entry Only) -->
+        <table id="assetTable" class="table table-bordered mb-4" style="display:none;">
+            <tr>
+                <td><label class="fw-bold">Asset Type</label></td>
+                <td>
+                    <select name="AssignedAssets[0].AssetTypeID" class="form-control">
+                        <option value="">-- Select Asset Type --</option>
+                        @foreach (var asset in Model.AssetTypes)
+                        {
+                            <option value="@asset.ID">@asset.AssetName</option>
+                        }
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><label>Description</label></td>
+                <td>
+                    <input type="text" name="AssignedAssets[0].Description" class="form-control" placeholder="Enter asset description" />
+                    <input type="hidden" name="AssignedAssets[0].EmployeeID" value="@Model.Details.EmployeeId" />
+                </td>
+            </tr>
+        </table>
+
+        <!-- Other Info: Asset Allocation -->
+       @*  <table id="assetTable" class="table table-bordered mb-4" style="display:none;">
+            <thead class="table-light">
+                <tr>
+                    <th>Asset Type</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.AssetTypes.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <select name="AssignedAssets[@i].AssetTypeID" class="form-control">
+                                @foreach (var asset in Model.AssetTypes)
+                                {
+                                    <option value="@asset.ID">@asset.AssetName</option>
+                                }
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="AssignedAssets[@i].Description" class="form-control" placeholder="Enter asset description" />
+                            <input type="hidden" name="AssignedAssets[@i].EmployeeID" value="@Model.Details.EmployeeId" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table> *@
+
+        @* <table id="assetTable" class="table table-bordered mb-4" style="display:none;">
+@*             <thead><tr><th>Asset Type</th><th>Description</th></tr></thead>
+ *@            @* <tbody>
+                @for (int i = 0; i < Model.AssetTypes.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <select name="AssignedAssets[@i].AssetTypeID" class="form-control">
+                                <option value="@Model.AssetTypes[i].ID">@Model.AssetTypes[i].AssetName</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="AssignedAssets[@i].Description" class="form-control" />
+                            <input type="hidden" name="AssignedAssets[@i].EmployeeID" value="@Model.Details.EmployeeId" />
+                        </td>
+                    </tr>
+                }
+
+            </tbody *@
+        </table> 
+@* 
+        <table id="salaryTable" class="table table-bordered mb-4" style="display:none;">
+            <tr><td>CTC Annual</td><td><input asp-for="SalaryDetails.CTCAnnual" class="form-control" /></td></tr>
+            <tr><td>FBP</td><td><input asp-for="SalaryDetails.FBP" class="form-control" /></td></tr>
+            <tr><td>Variable Pay</td><td><input asp-for="SalaryDetails.VariablePay" class="form-control" /></td></tr>
+        </table> *@
+
+        <!-- Salary Details Section -->
+        <table id="salaryTable" class="table table-bordered mb-4" style="display:none;">
+            <tr>
+                <td><label class="fw-bold text-danger">* CTC (annual)</label></td>
+                <td><input asp-for="SalaryDetails.CTCAnnual" class="form-control" placeholder="Enter Annual CTC" /></td>
+            </tr>
+            <tr>
+                <td><label>FBP</label></td>
+                <td><input asp-for="SalaryDetails.FBP" class="form-control" placeholder="Enter FBP" /></td>
+            </tr>
+            <tr>
+                <td><label>Variable Pay</label></td>
+                <td><input asp-for="SalaryDetails.VariablePay" class="form-control" placeholder="Enter Variable Pay" /></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="showComponents" onchange="toggleSalaryComponents()" />
+                        <label class="form-check-label" for="showComponents">
+                            Display CTC-based components
+                        </label>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- Dynamic Salary Breakdown Table -->
+        <table id="salaryComponentsTable" class="table table-bordered" style="display:none;">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 5%;"><input type="checkbox" id="selectAll" onclick="toggleAllSalaryComponents()" /></th>
+                    <th>Pay Type</th>
+                    <th>Formula</th>
+                    <th>Monthly</th>
+                    <th>Annual</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.SalaryComponents.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="SalaryEntries[@i].IsSelected" class="salaryCheckbox" />
+                            <input type="hidden" name="SalaryEntries[@i].ComponentID" value="@Model.SalaryComponents[i].ComponentID" />
+                            <input type="hidden" name="SalaryEntries[@i].EmployeeID" value="@Model.Details.EmployeeId" />
+                        </td>
+                        <td>@Model.SalaryComponents[i].ComponentName</td>
+                        <td>@Model.SalaryComponents[i].Formula</td>
+                        <td><input type="number" name="SalaryEntries[@i].MonthlyAmount" class="form-control" /></td>
+                        <td><input type="number" name="SalaryEntries[@i].AnnualAmount" class="form-control" /></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+
+        <table class="table table-bordered">
+@*             <thead><tr><th>Component</th><th>Monthly</th><th>Annual</th></tr></thead>
+ *@            <@* tbody>
+                @for (int i = 0; i < Model.SalaryComponents.Count; i++)
+                {
+                    <tr>
+                        <td>@Model.SalaryComponents[i].ComponentName</td>
+                        <td>
+                            <input type="number" name="SalaryEntries[@i].MonthlyAmount" class="form-control" />
+                            <input type="hidden" name="SalaryEntries[@i].ComponentID" value="@Model.SalaryComponents[i].ComponentID" />
+                            <input type="hidden" name="SalaryEntries[@i].EmployeeID" value="@Model.Details.EmployeeId" />
+                        </td>
+                        <td><input type="number" name="SalaryEntries[@i].AnnualAmount" class="form-control" /></td>
+                    </tr>
+                }
+            </tbody> *@
+        </table>
+
         <button type="submit" class="btn btn-success w-100 mt-3">Save Official Details</button>
     </form>
 </div>
@@ -118,11 +274,25 @@
 @section Scripts {
     <script>
         function showSection(id) {
-            $('#officialTable, #pfTable, #esiTable, #leaveTable').hide();
+            $('#officialTable, #pfTable, #esiTable, #leaveTable,#assetTable,#salaryTable,#salaryComponentsTable').hide();
             $('#' + id).show();
         }
         $(document).ready(() => showSection('officialTable'));
     </script>
+
+    <script>
+        function toggleSalaryComponents() {
+            const checkbox = document.getElementById('showComponents');
+            const table = document.getElementById('salaryComponentsTable');
+            table.style.display = checkbox.checked ? 'table' : 'none';
+        }
+
+        function toggleAllSalaryComponents() {
+            const master = document.getElementById('selectAll').checked;
+            document.querySelectorAll('.salaryCheckbox').forEach(cb => cb.checked = master);
+        }
+    </script>
+
 
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

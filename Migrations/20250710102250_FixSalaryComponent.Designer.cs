@@ -4,6 +4,7 @@ using HrManagementSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HrManagementSystem.Migrations
 {
     [DbContext(typeof(HrDbContext))]
-    partial class HrDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250710102250_FixSalaryComponent")]
+    partial class FixSalaryComponent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -250,17 +253,15 @@ namespace HrManagementSystem.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("EmployeeID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("EmployeeID")
+                        .HasColumnType("int");
 
                     b.HasKey("ID");
 
                     b.HasIndex("AssetTypeID");
-
-                    b.HasIndex("EmployeeID");
 
                     b.ToTable("EmployeeAssets");
                 });
@@ -415,9 +416,8 @@ namespace HrManagementSystem.Migrations
                     b.Property<int>("ComponentID")
                         .HasColumnType("int");
 
-                    b.Property<string>("EmployeeID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("EmployeeID")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("FBP")
                         .HasColumnType("decimal(18,2)");
@@ -431,8 +431,6 @@ namespace HrManagementSystem.Migrations
                     b.HasKey("ID");
 
                     b.HasIndex("ComponentID");
-
-                    b.HasIndex("EmployeeID");
 
                     b.ToTable("EmployeeSalaries");
                 });
@@ -901,15 +899,7 @@ namespace HrManagementSystem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("HrManagementSystem.Models.User", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("AssetType");
-
-                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.EmployeeClientAssignment", b =>
@@ -993,15 +983,7 @@ namespace HrManagementSystem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("HrManagementSystem.Models.User", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Component");
-
-                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.Timesheet", b =>

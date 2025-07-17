@@ -1455,6 +1455,7 @@ public IActionResult DeleteDepartment(int id)
        
         [HttpGet]
         public async Task<IActionResult> EnterOfficialDetails(string employeeId)
+        
         {
             try
             {
@@ -1464,7 +1465,9 @@ public IActionResult DeleteDepartment(int id)
                     Employees = (List<User>)await _userManager.GetUsersInRoleAsync("Employee"),
                     JobTypes = _context.JobTypes.ToList(),
                     Designations = _context.Designations.ToList(),
-                    LeaveTypes = _context.LeaveTypes.ToList()
+                    LeaveTypes = _context.LeaveTypes.ToList(),
+                    AssetTypes = _context.AssetTypes.ToList(),
+                    SalaryComponents = _context.SalaryComponents.ToList()
                 };
 
                 return View(model);
@@ -1483,20 +1486,20 @@ public IActionResult DeleteDepartment(int id)
 
             try
             {
-                if (ModelState.IsValid)
-                {
-                    //var vm = new EmployeeOffDetailsViewModel
-                    //{
-                    //    Details = details,
-                    //    Employees = (List<User>)await _userManager.GetUsersInRoleAsync("Employee"),
-                    //    JobTypes = _context.JobTypes.ToList(),
-                    //    Designations = _context.Designations.ToList()
-                    //};
+                //if (ModelState.IsValid)
+                //{
+                //    //var vm = new EmployeeOffDetailsViewModel
+                //    //{
+                //    //    Details = details,
+                //    //    Employees = (List<User>)await _userManager.GetUsersInRoleAsync("Employee"),
+                //    //    JobTypes = _context.JobTypes.ToList(),
+                //    //    Designations = _context.Designations.ToList()
+                //    //};
 
-                    //_context.EmployeeOffDetails.Add(details);
-                    //await _context.SaveChangesAsync();
-                    //return RedirectToAction("Index", "Home");
-                }
+                //    //_context.EmployeeOffDetails.Add(details);
+                //    //await _context.SaveChangesAsync();
+                //    //return RedirectToAction("Index", "Home");
+                //}
                 
                // return View(vm);
 

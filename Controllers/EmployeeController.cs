@@ -138,6 +138,52 @@ namespace HrManagementSystem.Controllers
 
             return View(policies);
         }
+        [HttpGet]
+        public async Task<IActionResult> ApplyLeave()
+        {
+            var vm = new ApplyLeaveViewModel
+            {
+                LeaveTypes = _context.LeaveTypes.Where(x => x.IsActive).ToList()
+            };
+            return View(vm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ApplyLeave(ApplyLeaveViewModel model)
+        {
+            //if (!ModelState.IsValid)
+            //{
+            //    model.LeaveTypes = _context.LeaveTypes.Where(x => x.IsActive).ToList();
+            //    return View(model);
+            //}
+
+            var leaveRequest = new LeaveApplication
+            {
+                EmployeeID = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                LeaveTypeId = model.LeaveTypeId,
+                IsHalfDay = model.DurationType == "HalfDay",
+                FromDate = model.DurationType == "FullDay" ? model.FromDate.GetValueOrDefault() : model.SingleDate.GetValueOrDefault(),
+                ToDate = model.DurationType == "FullDay" ? model.ToDate.GetValueOrDefault() : model.SingleDate.GetValueOrDefault(),
+                Reason = model.Reason,
+                SubmittedOn = DateTime.Now
+            };
+
+            if (model.Attachment != null)
+            {
+                // Save file to server and store path (simplified)
+                var fileName = Path.GetFileName(model.Attachment.FileName);
+                var path = Path.Combine("wwwroot/uploads", fileName);
+                using var stream = new FileStream(path, FileMode.Create);
+                await model.Attachment.CopyToAsync(stream);
+                leaveRequest.AttachmentPath = "/uploads/" + fileName;
+            }
+
+            _context.LeaveApplications.Add(leaveRequest);
+            await _context.SaveChangesAsync();
+            TempData["Message"] = "Leave request submitted successfully.";
+            return RedirectToAction("Index", "Employee");
+        }
+
         #endregion
 
         #region Timesheet crud

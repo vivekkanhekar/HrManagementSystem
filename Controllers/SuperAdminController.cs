@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using NuGet.Protocol.Core.Types;
 using System.Data;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace HrManagementSystem.Controllers
 {
@@ -1522,6 +1523,8 @@ public IActionResult DeleteDepartment(int id)
         }
 
         #endregion
+
+      
 
         public async Task<List<SelectListItem>> getUserByRoles(string roleName)
         {

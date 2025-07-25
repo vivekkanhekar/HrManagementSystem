@@ -1,0 +1,74 @@
+﻿@model HrManagementSystem.Models.ApplyLeaveViewModel
+
+@{
+    ViewBag.Title = "Apply Leave";
+}
+
+<h2 class="mb-4 text-center">Apply for Leave</h2>
+
+<div class="w-50 mx-auto border p-4 rounded shadow">
+    <form asp-action="ApplyLeave" asp-controller="Employee" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label class="form-label fw-bold">Leave Type</label>
+            <select asp-for="LeaveTypeId" asp-items="@(new SelectList(Model.LeaveTypes, "Leave_Id", "LeaveName"))" class="form-control">
+                <option value="">-- Select Leave Type --</option>
+            </select>
+            <span asp-validation-for="LeaveTypeId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Leave Duration</label><br />
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="DurationType" value="FullDay" checked onclick="toggleDatePickers()" />
+                <label class="form-check-label">Full Day</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="DurationType" value="HalfDay" onclick="toggleDatePickers()" />
+                <label class="form-check-label">Half Day</label>
+            </div>
+        </div>
+
+        <div id="fullDayDates" class="mb-3">
+            <label class="form-label">From Date</label>
+            <input type="date" asp-for="FromDate" class="form-control" />
+            <label class="form-label mt-2">To Date</label>
+            <input type="date" asp-for="ToDate" class="form-control" />
+        </div>
+
+        <div id="halfDayDate" class="mb-3" style="display:none;">
+            <label class="form-label">Date</label>
+            <input type="date" asp-for="SingleDate" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Reason</label>
+            <textarea asp-for="Reason" class="form-control" rows="3" placeholder="Enter leave reason..."></textarea>
+            <span asp-validation-for="Reason" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Attachment (Optional)</label>
+            <input type="file" asp-for="Attachment" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.docx" />
+        </div>
+
+        <button type="submit" class="btn btn-success w-100">Submit Leave Request</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleDatePickers() {
+            const duration = document.querySelector('input[name="DurationType"]:checked').value;
+            document.getElementById('fullDayDates').style.display = duration === 'FullDay' ? 'block' : 'none';
+            document.getElementById('halfDayDate').style.display = duration === 'HalfDay' ? 'block' : 'none';
+        }
+
+        $(document).ready(function () {
+            toggleDatePickers(); // handle initial state
+        });
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

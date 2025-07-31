@@ -687,6 +687,116 @@ namespace HrManagementSystem.Controllers
             var users = await _userManager.GetUsersInRoleAsync(roleName);
             return users.Where(x => x.EmailConfirmed == true).ToList();
         }
+
+        [HttpGet]
+        public IActionResult ManageLeave(DateTime? fromDate, DateTime? toDate, int? employeeId, int? leaveTypeId)
+        {
+            // Step 1: Query base leave applications with Includes to avoid lazy loading  
+            var query = _context.LeaveApplications
+                .Include(l => l.Employee)
+                .Include(l => l.LeaveType)
+                .AsQueryable(); // Required for dynamic filtering  
+
+            // Step 2: Apply filters (if any)  
+            if (fromDate.HasValue)
+                query = query.Where(l => l.FromDate >= fromDate.Value);
+
+            if (toDate.HasValue)
+                query = query.Where(l => l.ToDate <= toDate.Value);
+
+            if (leaveTypeId.HasValue)
+                query = query.Where(l => l.LeaveTypeId == leaveTypeId.Value);
+
+            // Step 3: Map LeaveApplication to EmployeeLeave  
+            var leaveApplications = query
+                .Select(l => new EmployeeLeave
+                {
+                    Id = l.Id,
+                   // EmpOffId = l.EmployeeID, // Assuming EmployeeID is a string and can be parsed to int  
+                    LeaveTypeId = l.LeaveTypeId,
+                    FromDate = l.FromDate,
+                    ToDate = l.ToDate,
+                    Reason = l.Reason,
+                    Status = "Pending", // Default status or map appropriately  
+                    EmployeeOffDetails = new EmployeeOffDetails
+                    {
+                        Employee = l.Employee
+                    },
+                    LeaveType = l.LeaveType,
+                    EmpOffId = l.EmployeeID // Assuming Employee has Id property
+                })
+                .ToList();
+
+            // Step 4: Prepare dropdown filters (materialize before assigning to ViewModel)  
+            var employees = _context.Employees
+                .Select(e => new SelectListItem
+                {
+                    Value = e.Id.ToString(),
+                    Text = e.FirstName + " " + e.LastName
+                })
+                .ToList();
+
+            var leaveTypes = _context.LeaveTypes
+                .Select(lt => new SelectListItem
+                {
+                    Value = lt.Leave_Id.ToString(),
+                    Text = lt.LeaveName
+                })
+                .ToList();
+
+            // Step 5: Construct ViewModel  
+            var viewModel = new ManageLeaveFilterViewModel
+            {
+                EmployeeLeave = leaveApplications,
+                Employees = employees,
+                LeaveTypes = leaveTypes,
+                FromDate = fromDate,
+                ToDate = toDate,
+                SelectedEmployeeId = employeeId,
+                SelectedLeaveTypeId = leaveTypeId
+            };
+
+            return View(viewModel);
+        }
+
+
+        public IActionResult ApproveLeave(string id)
+        {
+            var leave = _context.LeaveApplications.Where(x=>x.EmployeeID==id).FirstOrDefault();
+            if (leave != null)
+            {
+                leave.Status = "Approved";
+                _context.Add(leave);
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction("ManageLeave");
+        }
+
+
+        //public IActionResult ApproveLeave(int id)
+        //{
+        //    var leave = _context.EmployeeLeaves.Find(id);
+
+        //    if (leave != null)
+        //    {
+        //        leave.Status = "Approved";
+        //        _context.SaveChanges();
+        //    }
+        //    return RedirectToAction("ManageLeave");
+        //}
+
+        public IActionResult RejectLeave(string id)
+        {
+            var leave = _context.EmployeeLeaves.Find(id);
+            if (leave != null)
+            {
+                leave.Status = "Rejected";
+                _context.SaveChanges();
+            }
+            return RedirectToAction("ManageLeave");
+        }
+
     }
 }
 

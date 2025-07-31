@@ -1,0 +1,72 @@
+﻿@model HrManagementSystem.Models.ManageLeaveFilterViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+<h2>Manage Leave Requests</h2>
+
+<form method="get" asp-action="ManageLeave">
+    <div class="row mb-3">
+        <div class="col-md-2">
+            <label>From Date</label>
+            <input type="date" class="form-control" name="fromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-2">
+            <label>To Date</label>
+            <input type="date" class="form-control" name="toDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-3">
+            <label>Employee</label>
+            @Html.DropDownList("employeeId", new SelectList(Model.Employees, "Value", "Text", Model.SelectedEmployeeId), "All", new { @class = "form-control" })
+        </div>
+        <div class="col-md-3">
+            <label>Leave Type</label>
+            @Html.DropDownList("leaveTypeId", new SelectList(Model.LeaveTypes, "Value", "Text", Model.SelectedLeaveTypeId), "All", new { @class = "form-control" })
+        </div>
+        <div class="col-md-2 mt-4">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </div>
+</form>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Employee</th>
+            <th>Leave Type</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var leave in Model.EmployeeLeave)
+        {
+            <tr>
+                <td>@leave.Id</td> <!-- Add this temporarily to confirm ID -->
+                <td>@leave.EmpOffId</td>
+                <td>@leave.LeaveType.LeaveName</td>
+                <td>@leave.FromDate.ToShortDateString()</td>
+                <td>@leave.ToDate.ToShortDateString()</td>
+                <td>@leave.Reason</td>
+                <td>
+                    <span class="badge @(leave.Status == "Pending" ? "bg-warning" : leave.Status == "Approved" ? "bg-success" : "bg-danger")">
+                        @leave.Status
+                    </span>
+                </td>
+                <td>
+                    @if (leave.Status == "Pending")
+                    {
+                        <button type="button" asp-action="ApproveLeave" asp-controller="Manager" asp-asp-route-id="@leave.EmpOffId">Approve</button>
+                        <a href="/Manager/ApproveLeave?id=@leave.EmpOffId" class="btn btn-success btn-sm">Approve</a>
+                        <a href="@Url.Action("RejectLeave", "Manager", new { id = leave.EmpOffId })" class="btn btn-danger btn-sm">Reject</a>
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

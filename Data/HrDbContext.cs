@@ -43,6 +43,7 @@ namespace HrManagementSystem.Data
         public DbSet<LeaveType> LeaveTypes { get; set; }
         public DbSet<EmployeeLeave> EmployeeLeaves { get; set; }
         public DbSet<LeaveApplication> LeaveApplications { get; set; }
+        public DbSet<EmployeeLoan> LoanApplication { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder); // Apply Identity configurations

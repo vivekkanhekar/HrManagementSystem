@@ -1,0 +1,19 @@
+﻿@model List<EmployeeLoan>
+
+<h3>Loan History</h3>
+<table class="table table-bordered">
+    <thead><tr><th>Loan ID</th><th>Start Date</th><th>Amount</th><th>EMI</th><th>Balance</th><th>Status</th></tr></thead>
+    <tbody>
+        @foreach (var loan in Model)
+        {
+            <tr>
+                <td>@loan.LoanId</td>
+                <td>@loan.LoanStartDate.ToShortDateString()</td>
+                <td>@loan.LoanAmount</td>
+                <td>@loan.EMI</td>
+                <td>@loan.BalanceAmount</td>
+                <td>@(loan.IsActive ? "Active" : "Closed")</td>
+            </tr>
+        }
+    </tbody>
+</table>

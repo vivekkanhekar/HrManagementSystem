@@ -1524,7 +1524,217 @@ public IActionResult DeleteDepartment(int id)
 
         #endregion
 
-      
+
+        #region EmployeeLoan CRUD
+
+        public IActionResult ViewEmpLoan(string searchTerm, bool? filterActive)
+        {
+            try
+            {
+                var loans = _context.LoanApplication.Include(l => l.Employee).AsQueryable();
+
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    loans = loans.Where(l =>
+                        (l.Employee != null && l.Employee.UserName.Contains(searchTerm)) ||
+                        l.LoanId.ToString().Contains(searchTerm));
+                }
+
+                if (filterActive.HasValue)
+                {
+                    loans = loans.Where(l => l.IsActive == filterActive.Value);
+                }
+
+                var model = new EmployeeLoanViewModel
+                {
+                    LoanList = loans.ToList(),
+                    SearchTerm = searchTerm,
+                    FilterActive = filterActive
+                };
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+               
+                Console.WriteLine($"Error in ViewEmpLoan: {ex.Message}");
+
+               
+                var errorModel = new EmployeeLoanViewModel
+                {
+                    LoanList = new List<EmployeeLoan>(),
+                    SearchTerm = searchTerm,
+                    FilterActive = filterActive
+                };
+                ViewBag.ErrorMessage = "An error occurred while loading loan records. Please try again later.";
+                return View(errorModel);
+
+                
+            }
+        }
+
+
+
+
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            try
+            {
+                ViewBag.EmployeeList = new SelectList(_context.Users.ToList(), "Id", "UserName");
+                return View(new EmployeeLoan());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in Create GET: {ex.Message}");
+
+                TempData["ErrorMessage"] = "An error occurred while loading the loan form.";
+                return RedirectToAction(nameof(ViewEmpLoan)); 
+            }
+            }
+
+            [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(EmployeeLoan loan)
+        {
+            try
+            {
+                loan.BalanceAmount = loan.LoanAmount;
+                loan.IsActive = true;
+
+                _context.LoanApplication.Add(loan);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(ViewEmpLoan));
+            }
+            catch (Exception ex)
+            {
+                
+                Console.WriteLine($"Error in Create POST: {ex.Message}");
+
+                TempData["ErrorMessage"] = "An error occurred while creating the loan.";
+            }
+
+            ViewBag.EmployeeList = new SelectList(_context.Users.ToList(), "Id", "UserName", loan.EmployeeId);
+            return View(loan);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            try
+            {
+                var loan = await _context.LoanApplication.FindAsync(id);
+                if (loan == null) return NotFound();
+
+                ViewBag.EmployeeList = new SelectList(_context.Users.ToList(), "Id", "UserName", loan.EmployeeId);
+                return View(loan);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GET Edit: {ex.Message}");
+
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, EmployeeLoan loan)
+        {
+            try
+            {
+                if (id != loan.LoanId) return NotFound();
+
+
+                _context.LoanApplication.Update(loan);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(ViewEmpLoan));
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                Console.WriteLine($"Concurrency error in POST Edit: {ex.Message}");
+                return StatusCode(409, "A concurrency error occurred while updating. Please try again.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in POST Edit: {ex.Message}");
+                return RedirectToAction("Error", "Home");
+            }
+            ViewBag.EmployeeList = new SelectList(_context.Users.ToList(), "Id", "UserName", loan.EmployeeId);
+            return View(loan);
+        }
+        [HttpGet]
+        
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                if (id <= 0) return NotFound();
+
+                var loan = await _context.LoanApplication.Include(l => l.Employee).FirstOrDefaultAsync(l => l.LoanId == id);
+                if (loan == null) return NotFound();
+
+                return View(loan);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "An unexpected error occurred while fetching loan details.";
+                return RedirectToAction(nameof(ViewEmpLoan));
+            }
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                    return BadRequest("Invalid loan id.");
+                var loan = await _context.LoanApplication.FindAsync(id);
+                _context.LoanApplication.Remove(loan);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(ViewEmpLoan));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "An unexpected error occurred while deleting the loan.";
+                return RedirectToAction(nameof(ViewEmpLoan));
+            }
+        }
+
+        // Loan History
+        public async Task<IActionResult> History(string employeeId)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(employeeId))
+                    return BadRequest("Employee Id is required.");
+
+                var history = await _context.LoanApplication
+                    .Include(l => l.Employee)
+                    .Where(l => l.EmployeeId == employeeId)
+                    .OrderByDescending(l => l.LoanStartDate)
+                    .ToListAsync();
+
+                if (history == null || !history.Any())
+                {
+                    TempData["InfoMessage"] = "No loan history found for this employee.";
+                }
+
+                return View(history);
+            }
+            catch (Exception ex)
+            {
+                // TODO: Log error (ex) using ILogger
+                TempData["ErrorMessage"] = "An unexpected error occurred while fetching loan history.";
+                return RedirectToAction(nameof(ViewEmpLoan));
+            }
+        }
+
+        #endregion
 
         public async Task<List<SelectListItem>> getUserByRoles(string roleName)
         {

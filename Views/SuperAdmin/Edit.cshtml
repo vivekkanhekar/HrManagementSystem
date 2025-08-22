@@ -1,0 +1,62 @@
+﻿@model HrManagementSystem.Models.EmployeeLoan
+
+@{
+    ViewData["Title"] = "Edit Loan";
+}
+
+<h3>Edit Loan</h3>
+<hr />
+
+<form asp-action="Edit" method="post">
+    @* Hidden LoanId so it posts back *@
+    <input type="hidden" asp-for="LoanId" />
+
+    <div class="form-group mb-3">
+        <label asp-for="EmployeeId" class="form-label">Employee</label>
+        <select asp-for="EmployeeId" asp-items="ViewBag.EmployeeList" class="form-control"></select>
+        <span asp-validation-for="EmployeeId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="LoanAmount" class="form-label">Loan Amount</label>
+        <input asp-for="LoanAmount" class="form-control" />
+        <span asp-validation-for="LoanAmount" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="EMI" class="form-label">EMI</label>
+        <input asp-for="EMI" class="form-control" />
+        <span asp-validation-for="EMI" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="TenureMonths" class="form-label">Tenure (Months)</label>
+        <input asp-for="TenureMonths" class="form-control" />
+        <span asp-validation-for="TenureMonths" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="LoanStartDate" class="form-label">Loan Start Date</label>
+        <input asp-for="LoanStartDate" type="date" class="form-control" />
+        <span asp-validation-for="LoanStartDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="BalanceAmount" class="form-label">Balance Amount</label>
+        <input asp-for="BalanceAmount" class="form-control" readonly />
+    </div>
+
+    <div class="form-group mb-3 form-check">
+        <input type="checkbox" asp-for="IsActive" class="form-check-input" />
+        <label asp-for="IsActive" class="form-check-label"></label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update Loan</button>
+    <a asp-action="ViewEmpLoan" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

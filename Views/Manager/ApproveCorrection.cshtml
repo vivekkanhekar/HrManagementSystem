@@ -1,0 +1,50 @@
+﻿@model HrManagementSystem.Models.AttendanceCorrection
+
+
+@{
+    ViewData["Title"] = "Approve Correction";
+}
+
+<h2>Approve Attendance Correction</h2>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<table class="table table-bordered">
+    <tr>
+        <th>Employee</th>
+        <td>@Model.?.Employee?.UserName</td>
+    </tr>
+    <tr>
+        <th>Date</th>
+        <td>@Model.Attendance?.AttendanceDate.ToShortDateString()</td>
+    </tr>
+    <tr>
+        <th>Current Punch In</th>
+        <td>@Model.Attendance?.PunchInTime?.ToString("HH:mm")</td>
+    </tr>
+    <tr>
+        <th>Requested Punch In</th>
+        <td>@Model.RequestedPunchIn?.ToString("HH:mm")</td>
+    </tr>
+    <tr>
+        <th>Current Punch Out</th>
+        <td>@Model.Attendance?.PunchOutTime?.ToString("HH:mm")</td>
+    </tr>
+    <tr>
+        <th>Requested Punch Out</th>
+        <td>@Model.RequestedPunchOut?.ToString("HH:mm")</td>
+    </tr>
+    <tr>
+        <th>Status</th>
+        <td>@Model.Status</td>
+    </tr>
+</table>
+
+<form asp-action="ApproveCorrectionConfirmed" method="post">
+    <input type="hidden" asp-for="CorrectionId" />
+    <button type="submit" class="btn btn-success">Confirm Approve</button>
+    <a asp-action="AttendanceMonitoring" class="btn btn-secondary">Cancel</a>
+</form>

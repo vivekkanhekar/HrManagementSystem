@@ -1,0 +1,32 @@
+﻿@model IEnumerable<HrManagementSystem.Models.EmployeeAttendance>
+@{
+    ViewData["Title"] = "Attendance Records";
+}
+
+<h2>Attendance Records</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Employee</th>
+            <th>Date</th>
+            <th>Punch In</th>
+            <th>Punch Out</th>
+            <th>Total Hours</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var record in Model)
+        {
+            <tr>
+                <td>@record.Employee?.UserName</td>
+                <td>@record.AttendanceDate.ToShortDateString()</td>
+                <td>@record.PunchInTime?.ToString("hh:mm tt")</td>
+                <td>@record.PunchOutTime?.ToString("hh:mm tt")</td>
+                <td>@record.TotalHours</td>
+                <td>@record.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>

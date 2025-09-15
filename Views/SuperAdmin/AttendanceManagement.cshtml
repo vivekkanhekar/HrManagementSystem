@@ -1,0 +1,85 @@
+﻿@model IEnumerable<HrManagementSystem.Models.EmployeeAttendance>
+
+<h2>Attendance Management</h2>
+
+@* <form method="get" asp-action="AttendanceManagement">
+    <div class="form-group">
+        <label>Month:</label>
+        
+
+        <select name="month" class="form-control">
+            <option value="">--Select Month--</option>
+            @foreach (var month in ViewBag.Months as List<int>)
+            {
+                <option value="@month">@month</option>
+            }
+        </select>
+
+        <label>Year:</label>
+        <select name="Year" class="form-control">
+            <option value="">--Select Year--</option>
+            @foreach (var year in ViewBag.Years as List<int>)
+            {
+                <option value="@year">@year</option>
+            }
+        </select>
+
+        <button type="submit" class="btn btn-primary">Filter</button>
+        <a asp-action="ExportMonthlyAttendance" asp-route-month="@DateTime.Today.Month" asp-route-year="@DateTime.Today.Year" class="btn btn-success">Export to Excel</a>
+    </div>
+</form> *@
+
+<form method="get" asp-action="AttendanceManagement">
+    <div class="form-group">
+        <label>Month:</label>
+        <select name="month" class="form-control">
+            <option value="">--Select Month--</option>
+            @foreach (var month in ViewBag.Months as List<int>)
+            {
+                <option value="@month">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month)</option>
+            }
+        </select>
+
+        <label>Year:</label>
+        <select name="year" class="form-control">
+            <option value="">--Select Year--</option>
+            @foreach (var year in ViewBag.Years as List<int>)
+            {
+                <option value="@year">@year</option>
+            }
+        </select>
+
+        <button type="submit" class="btn btn-primary">Filter</button>
+        <a asp-action="ExportMonthlyAttendance"
+           asp-route-month="@DateTime.Today.Month"
+           asp-route-year="@DateTime.Today.Year"
+           class="btn btn-success">Export to Excel</a>
+    </div>
+</form>
+
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Employee</th>
+            <th>Date</th>
+            <th>Punch In</th>
+            <th>Punch Out</th>
+            <th>Total Hours</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var rec in Model)
+        {
+            <tr>
+                <td>@rec.Employee?.UserName</td>
+                <td>@rec.AttendanceDate.ToShortDateString()</td>
+                <td>@rec.PunchInTime?.ToString("HH:mm")</td>
+                <td>@rec.PunchOutTime?.ToString("HH:mm")</td>
+                <td>@rec.TotalHours</td>
+                <td>@rec.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,19 +1,19 @@
-﻿using HrManagementSystem.Data;
+﻿using ClosedXML.Excel;
+using HrManagementSystem.Data;
 using HrManagementSystem.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Hosting;
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
-
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using System.Drawing;
+using System.Security.Claims;
 
 namespace HrManagementSystem.Controllers
 {
@@ -30,10 +30,12 @@ namespace HrManagementSystem.Controllers
         private readonly ICompositeViewEngine _viewEngine;
 
         private readonly HrDbContext _context;
+        private readonly ILogger<ManagerController> _logger;
+
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly object workbook;
         #endregion
-        public ManagerController(ICompositeViewEngine viewEngine, IWebHostEnvironment hostingEnvironment, UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<Role> roleManager, HrDbContext dbContext)
+        public ManagerController(ICompositeViewEngine viewEngine, IWebHostEnvironment hostingEnvironment, UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<Role> roleManager, HrDbContext dbContext, ILogger<ManagerController> logger)
         {
             _viewEngine = viewEngine;
 
@@ -43,6 +45,7 @@ namespace HrManagementSystem.Controllers
             this._hostingEnvironment = hostingEnvironment;
             var options = new DbContextOptionsBuilder<HrDbContext>().UseSqlServer("RSDatabase").Options;
             this._context = dbContext;
+            this._logger = logger;
         }
         //public IActionResult Index()
         //{
@@ -118,6 +121,7 @@ namespace HrManagementSystem.Controllers
                 ViewBag.ErrorMessage = "An error occurred while loading the timesheets.";
                 return View("Error");
             }
+
         }
 
         [HttpGet]
@@ -343,7 +347,8 @@ namespace HrManagementSystem.Controllers
             }
             catch(Exception ex)
             {
-                // Handle exception (e.g., log it)
+                _logger.LogError(ex, "Error occurred while retrieving appraisal template.");
+
                 ModelState.AddModelError("", "An error occurred while loading the appraisal template: " + ex.Message);
             }
             return View();
@@ -470,13 +475,24 @@ namespace HrManagementSystem.Controllers
 
         public async Task<IActionResult> ViewAppraisals()
         {
-            var appraisals = await _context.appraisalResponses
-                //.Include(a => a.KeyEntries) 
-                .Include(a => a.Employee) 
-                .ToListAsync();
+            try
+            {
+                var appraisals = await _context.appraisalResponses
+                    //.Include(a => a.KeyEntries) 
+                    .Include(a => a.Employee)
+                    .ToListAsync();
 
-            return View(appraisals);
+                return View(appraisals);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while fetching appraisals in ViewAppraisals.");
+
+                TempData["ErrorMessage"] = "An unexpected error occurred while loading appraisals. Please try again later.";
+                return RedirectToAction("Error", "Home");
+            }
         }
+
         //[HttpPost]
         //public async Task<IActionResult> CreateAppraisalTemplate([FromForm] IFormFile file, AppraisalTemplate template)
         //{
@@ -676,7 +692,7 @@ namespace HrManagementSystem.Controllers
             }
             catch(Exception ex)
             {
-                // Handle exception (e.g., log it)
+                _logger.LogError(ex, "Error occurred while user roles.");
                 ModelState.AddModelError("", "An error occurred while retrieving users: " + ex.Message);
                 return new List<SelectListItem>();
             }
@@ -691,113 +707,444 @@ namespace HrManagementSystem.Controllers
         [HttpGet]
         public IActionResult ManageLeave(DateTime? fromDate, DateTime? toDate, int? employeeId, int? leaveTypeId)
         {
-            // Step 1: Query base leave applications with Includes to avoid lazy loading  
-            var query = _context.LeaveApplications
-                .Include(l => l.Employee)
-                .Include(l => l.LeaveType)
-                .AsQueryable(); // Required for dynamic filtering  
-
-            // Step 2: Apply filters (if any)  
-            if (fromDate.HasValue)
-                query = query.Where(l => l.FromDate >= fromDate.Value);
-
-            if (toDate.HasValue)
-                query = query.Where(l => l.ToDate <= toDate.Value);
-
-            if (leaveTypeId.HasValue)
-                query = query.Where(l => l.LeaveTypeId == leaveTypeId.Value);
-
-            // Step 3: Map LeaveApplication to EmployeeLeave  
-            var leaveApplications = query
-                .Select(l => new EmployeeLeave
-                {
-                    Id = l.Id,
-                   // EmpOffId = l.EmployeeID, // Assuming EmployeeID is a string and can be parsed to int  
-                    LeaveTypeId = l.LeaveTypeId,
-                    FromDate = l.FromDate,
-                    ToDate = l.ToDate,
-                    Reason = l.Reason,
-                    Status = "Pending", // Default status or map appropriately  
-                    EmployeeOffDetails = new EmployeeOffDetails
-                    {
-                        Employee = l.Employee
-                    },
-                    LeaveType = l.LeaveType,
-                    EmpOffId = l.EmployeeID // Assuming Employee has Id property
-                })
-                .ToList();
-
-            // Step 4: Prepare dropdown filters (materialize before assigning to ViewModel)  
-            var employees = _context.Employees
-                .Select(e => new SelectListItem
-                {
-                    Value = e.Id.ToString(),
-                    Text = e.FirstName + " " + e.LastName
-                })
-                .ToList();
-
-            var leaveTypes = _context.LeaveTypes
-                .Select(lt => new SelectListItem
-                {
-                    Value = lt.Leave_Id.ToString(),
-                    Text = lt.LeaveName
-                })
-                .ToList();
-
-            // Step 5: Construct ViewModel  
-            var viewModel = new ManageLeaveFilterViewModel
+            try
             {
-                EmployeeLeave = leaveApplications,
-                Employees = employees,
-                LeaveTypes = leaveTypes,
-                FromDate = fromDate,
-                ToDate = toDate,
-                SelectedEmployeeId = employeeId,
-                SelectedLeaveTypeId = leaveTypeId
-            };
+                // Step 1: Query base leave applications  
+                var query = _context.LeaveApplications
+                    .Include(l => l.Employee)
+                    .Include(l => l.LeaveType)
+                    .AsQueryable();
 
-            return View(viewModel);
+                // Step 2: Apply filters  
+                if (fromDate.HasValue)
+                    query = query.Where(l => l.FromDate >= fromDate.Value);
+
+                if (toDate.HasValue)
+                    query = query.Where(l => l.ToDate <= toDate.Value);
+
+                if (leaveTypeId.HasValue)
+                    query = query.Where(l => l.LeaveTypeId == leaveTypeId.Value);
+
+                // Step 3: Project into ViewModel  
+                var leaveApplications = query
+                    .Select(l => new EmployeeLeave
+                    {
+                        Id = l.Id,
+                        LeaveTypeId = l.LeaveTypeId,
+                        FromDate = l.FromDate,
+                        ToDate = l.ToDate,
+                        Reason = l.Reason,
+                        Status = l.Status ?? "Pending",
+                        EmployeeOffDetails = new EmployeeOffDetails
+                        {
+                            Employee = l.Employee
+                        },
+                        LeaveType = l.LeaveType,
+                        EmpOffId = l.EmployeeID
+                    })
+                    .ToList();
+
+                // Step 4: Dropdowns  
+                var employees = _context.Employees
+                    .Select(e => new SelectListItem
+                    {
+                        Value = e.Id.ToString(),
+                        Text = e.FirstName + " " + e.LastName
+                    })
+                    .ToList();
+
+                var leaveTypes = _context.LeaveTypes
+                    .Select(lt => new SelectListItem
+                    {
+                        Value = lt.Leave_Id.ToString(),
+                        Text = lt.LeaveName
+                    })
+                    .ToList();
+
+                // Step 5: Construct ViewModel  
+                var viewModel = new ManageLeaveFilterViewModel
+                {
+                    EmployeeLeave = leaveApplications,
+                    Employees = employees,
+                    LeaveTypes = leaveTypes,
+                    FromDate = fromDate,
+                    ToDate = toDate,
+                    SelectedEmployeeId = employeeId,
+                    SelectedLeaveTypeId = leaveTypeId
+                };
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while managing leave.");
+                TempData["Error"] = "An error occurred while fetching leave applications.";
+                return View(new ManageLeaveFilterViewModel
+                {
+                    EmployeeLeave = new List<EmployeeLeave>(),
+                    Employees = new List<SelectListItem>(),
+                    LeaveTypes = new List<SelectListItem>()
+                });
+            }
         }
 
-
+        // Approve Leave
         public IActionResult ApproveLeave(string id)
         {
-            var leave = _context.LeaveApplications.Where(x=>x.EmployeeID==id).FirstOrDefault();
-            if (leave != null)
+            try
             {
-                leave.Status = "Approved";
-                _context.Add(leave);
-                _context.SaveChanges();
+                var leave = _context.LeaveApplications.FirstOrDefault(x => x.EmployeeID == id);
+                if (leave != null)
+                {
+                    leave.Status = "Approved";
+                    _context.LeaveApplications.Update(leave);
+                    _context.SaveChanges();
+                    TempData["Success"] = "Leave approved successfully.";
+                }
+                else
+                {
+                    TempData["Error"] = "Leave request not found.";
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error approving leave for EmployeeID {EmployeeId}", id);
+                TempData["Error"] = "An error occurred while approving leave.";
             }
 
             return RedirectToAction("ManageLeave");
         }
 
+        // Reject Leave
+        public IActionResult RejectLeave(string id)
+        {
+            try
+            {
+                var leave = _context.LeaveApplications.FirstOrDefault(x => x.EmployeeID == id);
+                if (leave != null)
+                {
+                    leave.Status = "Rejected";
+                    _context.LeaveApplications.Update(leave);
+                    _context.SaveChanges();
+                    TempData["Success"] = "Leave rejected successfully.";
+                }
+                else
+                {
+                    TempData["Error"] = "Leave request not found.";
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error rejecting leave for EmployeeID {EmployeeId}", id);
+                TempData["Error"] = "An error occurred while rejecting leave.";
+            }
 
-        //public IActionResult ApproveLeave(int id)
+            return RedirectToAction("ManageLeave");
+        }
+        //public IActionResult ManageLeave(DateTime? fromDate, DateTime? toDate, int? employeeId, int? leaveTypeId)
         //{
-        //    var leave = _context.EmployeeLeaves.Find(id);
+        //    // Step 1: Query base leave applications with Includes to avoid lazy loading  
+        //    var query = _context.LeaveApplications
+        //        .Include(l => l.Employee)
+        //        .Include(l => l.LeaveType)
+        //        .AsQueryable(); // Required for dynamic filtering  
 
+        //    // Step 2: Apply filters (if any)  
+        //    if (fromDate.HasValue)
+        //        query = query.Where(l => l.FromDate >= fromDate.Value);
+
+        //    if (toDate.HasValue)
+        //        query = query.Where(l => l.ToDate <= toDate.Value);
+
+        //    if (leaveTypeId.HasValue)
+        //        query = query.Where(l => l.LeaveTypeId == leaveTypeId.Value);
+
+        //    // Step 3: Map LeaveApplication to EmployeeLeave  
+        //    var leaveApplications = query
+        //        .Select(l => new EmployeeLeave
+        //        {
+        //            Id = l.Id,
+        //           // EmpOffId = l.EmployeeID, // Assuming EmployeeID is a string and can be parsed to int  
+        //            LeaveTypeId = l.LeaveTypeId,
+        //            FromDate = l.FromDate,
+        //            ToDate = l.ToDate,
+        //            Reason = l.Reason,
+        //            Status = "Pending", // Default status or map appropriately  
+        //            EmployeeOffDetails = new EmployeeOffDetails
+        //            {
+        //                Employee = l.Employee
+        //            },
+        //            LeaveType = l.LeaveType,
+        //            EmpOffId = l.EmployeeID // Assuming Employee has Id property
+        //        })
+        //        .ToList();
+
+        //    // Step 4: Prepare dropdown filters (materialize before assigning to ViewModel)  
+        //    var employees = _context.Employees
+        //        .Select(e => new SelectListItem
+        //        {
+        //            Value = e.Id.ToString(),
+        //            Text = e.FirstName + " " + e.LastName
+        //        })
+        //        .ToList();
+
+        //    var leaveTypes = _context.LeaveTypes
+        //        .Select(lt => new SelectListItem
+        //        {
+        //            Value = lt.Leave_Id.ToString(),
+        //            Text = lt.LeaveName
+        //        })
+        //        .ToList();
+
+        //    // Step 5: Construct ViewModel  
+        //    var viewModel = new ManageLeaveFilterViewModel
+        //    {
+        //        EmployeeLeave = leaveApplications,
+        //        Employees = employees,
+        //        LeaveTypes = leaveTypes,
+        //        FromDate = fromDate,
+        //        ToDate = toDate,
+        //        SelectedEmployeeId = employeeId,
+        //        SelectedLeaveTypeId = leaveTypeId
+        //    };
+
+        //    return View(viewModel);
+        //}
+
+
+        //public IActionResult ApproveLeave(string id)
+        //{
+        //    var leave = _context.LeaveApplications.Where(x=>x.EmployeeID==id).FirstOrDefault();
         //    if (leave != null)
         //    {
         //        leave.Status = "Approved";
+        //        _context.Add(leave);
+        //        _context.SaveChanges();
+        //    }
+
+        //    return RedirectToAction("ManageLeave");
+        //}
+
+
+
+
+        //public IActionResult RejectLeave(string id)
+        //{
+        //    var leave = _context.EmployeeLeaves.Find(id);
+        //    if (leave != null)
+        //    {
+        //        leave.Status = "Rejected";
         //        _context.SaveChanges();
         //    }
         //    return RedirectToAction("ManageLeave");
         //}
-
-        public IActionResult RejectLeave(string id)
+        public async Task<IActionResult> AttendanceMonitoring(string filter = "daily")
         {
-            var leave = _context.EmployeeLeaves.Find(id);
-            if (leave != null)
+            try
             {
-                leave.Status = "Rejected";
-                _context.SaveChanges();
+                DateTime startDate = DateTime.Now.Date;
+                DateTime endDate = DateTime.Now.Date;
+
+                if (filter == "weekly")
+                {
+                    startDate = DateTime.Now.Date.AddDays(-7);
+                }
+                else if (filter == "monthly")
+                {
+                    startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                    endDate = startDate.AddMonths(1).AddDays(-1);
+                }
+
+                var records = await _context.EmployeeAttendances
+                    .Include(a => a.Employee)
+                    .Where(a => a.AttendanceDate >= startDate && a.AttendanceDate <= endDate)
+                    .OrderByDescending(a => a.AttendanceDate)
+                    .ToListAsync();
+
+                ViewBag.Filter = filter;
+                return View(records);
             }
-            return RedirectToAction("ManageLeave");
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while loading AttendanceMonitoring.");
+                TempData["ErrorMessage"] = "An error occurred while fetching attendance records.";
+                return View(new List<EmployeeAttendance>()); // return empty list to avoid crash
+            }
         }
 
-    }
+        // Approve Correction
+        [HttpGet]
+        public async Task<IActionResult> ApproveCorrection(int id)
+        {
+            try
+            {
+                var correction = await _context.AttendanceCorrections
+                    .Include(c => c.Attendance)
+                    .ThenInclude(a => a.Employee)
+                    .FirstOrDefaultAsync(c => c.CorrectionId == id);
+
+                if (correction == null)
+                {
+                    TempData["ErrorMessage"] = "Correction not found.";
+                    return RedirectToAction("AttendanceMonitoring");
+                }
+
+                return View(correction);  // send correction details to view
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error loading correction for approval (ID {id})");
+                TempData["ErrorMessage"] = "Error loading correction.";
+                return RedirectToAction("AttendanceMonitoring");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveCorrectionConfirmed(int id)
+        {
+            try
+            {
+                var correction = await _context.AttendanceCorrections
+                    .Include(c => c.Attendance)
+                    .FirstOrDefaultAsync(c => c.CorrectionId == id);
+
+                if (correction != null)
+                {
+                    correction.Status = "Approved";
+                    correction.Attendance.PunchInTime = correction.RequestedPunchIn ?? correction.Attendance.PunchInTime;
+                    correction.Attendance.PunchOutTime = correction.RequestedPunchOut ?? correction.Attendance.PunchOutTime;
+
+                    if (correction.Attendance.PunchInTime != null && correction.Attendance.PunchOutTime != null)
+                    {
+                        correction.Attendance.TotalHours =
+                            (decimal)(correction.Attendance.PunchOutTime.Value - correction.Attendance.PunchInTime.Value).TotalHours;
+                    }
+
+                    _context.AttendanceCorrections.Update(correction);
+                    await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = "Correction approved successfully.";
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error approving correction (ID {id})");
+                TempData["ErrorMessage"] = "Failed to approve correction.";
+            }
+
+            return RedirectToAction("AttendanceMonitoring");
+        }
+
+        //[HttpPost]
+        //public async Task<IActionResult> ApproveCorrection(int id)
+        //{
+        //    try
+        //    {
+        //        var correction = await _context.AttendanceCorrections
+        //            .Include(c => c.Attendance)
+        //            .FirstOrDefaultAsync(c => c.CorrectionId == id);
+
+        //        if (correction != null)
+        //        {
+        //            correction.Status = "Approved";
+        //            correction.Attendance.PunchInTime = correction.RequestedPunchIn ?? correction.Attendance.PunchInTime;
+        //            correction.Attendance.PunchOutTime = correction.RequestedPunchOut ?? correction.Attendance.PunchOutTime;
+
+        //            if (correction.Attendance.PunchInTime != null && correction.Attendance.PunchOutTime != null)
+        //            {
+        //                correction.Attendance.TotalHours =
+        //                    (decimal)(correction.Attendance.PunchOutTime.Value - correction.Attendance.PunchInTime.Value).TotalHours;
+        //            }
+
+        //            _context.AttendanceCorrections.Update(correction);
+        //            await _context.SaveChangesAsync();
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, $"Error approving correction for ID {id}");
+        //        TempData["ErrorMessage"] = "Failed to approve correction.";
+        //    }
+
+        //    return RedirectToAction("AttendanceMonitoring");
+        //}
+
+        // Reject Correction
+        [HttpPost]
+        public async Task<IActionResult> RejectCorrection(int id)
+        {
+            try
+            {
+                var correction = await _context.AttendanceCorrections.FindAsync(id);
+                if (correction != null)
+                {
+                    correction.Status = "Rejected";
+                    _context.AttendanceCorrections.Update(correction);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error rejecting correction for ID {id}");
+                TempData["ErrorMessage"] = "Failed to reject correction.";
+            }
+
+            return RedirectToAction("AttendanceMonitoring");
+        }
+
+        // Export to Excel
+        public IActionResult ExportToExcel(string filter = "daily")
+        {
+            try
+            {
+                var records = _context.EmployeeAttendances
+                    .Include(a => a.Employee)
+                    .OrderByDescending(a => a.AttendanceDate)
+                    .ToList();
+
+                using (var workbook = new XLWorkbook())
+                {
+                    var ws = workbook.Worksheets.Add("Attendance");
+                    ws.Cell(1, 1).Value = "Employee";
+                    ws.Cell(1, 2).Value = "Date";
+                    ws.Cell(1, 3).Value = "Punch In";
+                    ws.Cell(1, 4).Value = "Punch Out";
+                    ws.Cell(1, 5).Value = "Total Hours";
+                    ws.Cell(1, 6).Value = "Status";
+
+                    int row = 2;
+                    foreach (var rec in records)
+                    {
+                        ws.Cell(row, 1).Value = rec.Employee?.UserName ?? "N/A";
+                        ws.Cell(row, 2).Value = rec.AttendanceDate;
+                        ws.Cell(row, 3).Value = rec.PunchInTime?.ToString() ?? "-";
+                        ws.Cell(row, 4).Value = rec.PunchOutTime?.ToString() ?? "-";
+                        ws.Cell(row, 5).Value = rec.TotalHours ?? 0;
+                        ws.Cell(row, 6).Value = rec.Status ?? "N/A";
+                        row++;
+                    }
+
+                    using (var stream = new System.IO.MemoryStream())
+                    {
+                        workbook.SaveAs(stream);
+                        var content = stream.ToArray();
+                        return File(content,
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            "AttendanceReport.xlsx");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while exporting attendance report to Excel.");
+                TempData["ErrorMessage"] = "Failed to export attendance report.";
+                return RedirectToAction("AttendanceMonitoring");
+            }
+        }
+    
+   
+}
 }
 
 

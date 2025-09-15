@@ -1,0 +1,45 @@
+﻿@model IEnumerable<HrManagementSystem.Models.EmployeeAttendance>
+@{
+    ViewData["Title"] = "My Attendance";
+}
+
+<h2>My Attendance</h2>
+
+<div>
+    <form asp-action="PunchIn" method="post" style="display:inline;">
+        <button type="submit" class="btn btn-success">Punch IN</button>
+    </form>
+
+    <form asp-action="PunchOut" method="post" style="display:inline;">
+        <button type="submit" class="btn btn-danger">Punch OUT</button>
+    </form>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<table class="table table-bordered mt-3">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Punch In</th>
+            <th>Punch Out</th>
+            <th>Total Hours</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var record in Model)
+        {
+            <tr>
+                <td>@record.AttendanceDate.ToShortDateString()</td>
+                <td>@record.PunchInTime?.ToString("hh:mm tt")</td>
+                <td>@record.PunchOutTime?.ToString("hh:mm tt")</td>
+                <td>@record.TotalHours</td>
+                <td>@record.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>

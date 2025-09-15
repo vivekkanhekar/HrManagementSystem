@@ -1,0 +1,44 @@
+﻿@model IEnumerable<HrManagementSystem.Models.EmployeeAttendance>
+@{
+    ViewData["Title"] = "Attendance Monitoring";
+}
+
+<h2>Attendance Monitoring</h2>
+
+<div class="btn-group mb-3">
+    <a asp-action="AttendanceMonitoring" asp-route-filter="daily" class="btn btn-outline-primary">Daily</a>
+    <a asp-action="AttendanceMonitoring" asp-route-filter="weekly" class="btn btn-outline-primary">Weekly</a>
+    <a asp-action="AttendanceMonitoring" asp-route-filter="monthly" class="btn btn-outline-primary">Monthly</a>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Employee</th>
+            <th>Date</th>
+            <th>Punch In</th>
+            <th>Punch Out</th>
+            <th>Total Hours</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var record in Model)
+        {
+            <tr>
+                <td>@record.Employee?.UserName</td>
+                <td>@record.AttendanceDate.ToShortDateString()</td>
+                <td>@record.PunchInTime?.ToString("hh:mm tt")</td>
+                <td>@record.PunchOutTime?.ToString("hh:mm tt")</td>
+                <td>@record.TotalHours</td>
+                <td>@record.Status</td>
+            </tr>
+        <td>
+            <a asp-action="ApproveCorrection" asp-route-id="@record.AttendanceId" class="btn btn-sm btn-success">Approve</a>
+            <a asp-action="RejectCorrection" asp-route-id="@record.AttendanceId" class="btn btn-sm btn-danger">Reject</a>
+        </td>
+        }
+    </tbody>
+</table>
+<a asp-action="ExportToExcel" class="btn btn-success">Export to Excel</a>
+

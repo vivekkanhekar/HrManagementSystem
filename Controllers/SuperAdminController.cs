@@ -1,4 +1,5 @@
 ﻿using AspNetCoreGeneratedDocument;
+using ClosedXML.Excel;
 using HrManagementSystem.Data;
 using HrManagementSystem.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -1736,6 +1737,107 @@ public IActionResult DeleteDepartment(int id)
 
         #endregion
 
+        public IActionResult AttendanceManagement(int? month, int? year)
+        {
+            try
+            {
+                // Populate dropdown values
+                ViewBag.Months = Enumerable.Range(1, 12).ToList();
+                ViewBag.Years = Enumerable.Range(DateTime.Today.Year - 4, 5).ToList();
+
+                // Query attendance records
+                var query = _context.EmployeeAttendances
+                    .Include(a => a.Employee)
+                    .AsQueryable();
+
+                if (month.HasValue)
+                    query = query.Where(a => a.AttendanceDate.Month == month.Value);
+
+                if (year.HasValue)
+                    query = query.Where(a => a.AttendanceDate.Year == year.Value);
+
+                var records = query.OrderBy(a => a.Employee.UserName).ToList();
+
+                // If no records found, show empty list (not error)
+                if (records == null || !records.Any())
+                {
+                    TempData["InfoMessage"] = "No attendance records found for the selected period.";
+                    return View(new List<EmployeeAttendance>());
+                }
+
+                return View(records);
+            }
+            catch (Exception ex)
+            {
+                // Log error (replace with your logger if available)
+                Console.WriteLine($"Error in AttendanceManagement: {ex.Message}");
+
+                // Show user-friendly error page or message
+                TempData["ErrorMessage"] = "Something went wrong while loading attendance records.";
+                return View(new List<EmployeeAttendance>());
+            }
+        }
+
+        public IActionResult ExportMonthlyAttendance(int month, int year)
+        {
+            try
+            {
+                var records = _context.EmployeeAttendances
+                    .Include(a => a.Employee)
+                    .Where(a => a.AttendanceDate.Month == month && a.AttendanceDate.Year == year)
+                    .ToList();
+
+                if (records == null || !records.Any())
+                {
+                    TempData["InfoMessage"] = "No attendance records available for export.";
+                    return RedirectToAction("AttendanceManagement");
+                }
+
+                using (var workbook = new XLWorkbook())
+                {
+                    var ws = workbook.Worksheets.Add("Monthly Attendance");
+
+                    // Headers
+                    ws.Cell(1, 1).Value = "Employee";
+                    ws.Cell(1, 2).Value = "Date";
+                    ws.Cell(1, 3).Value = "Punch In";
+                    ws.Cell(1, 4).Value = "Punch Out";
+                    ws.Cell(1, 5).Value = "Total Hours";
+                    ws.Cell(1, 6).Value = "Status";
+
+                    int row = 2;
+                    foreach (var rec in records)
+                    {
+                        ws.Cell(row, 1).Value = rec.Employee?.UserName ?? "N/A";
+                        ws.Cell(row, 2).Value = rec.AttendanceDate.ToShortDateString();
+                        ws.Cell(row, 3).Value = rec.PunchInTime?.ToString("HH:mm") ?? "-";
+                        ws.Cell(row, 4).Value = rec.PunchOutTime?.ToString("HH:mm") ?? "-";
+                        ws.Cell(row, 5).Value = rec.TotalHours ?? 0;
+                        ws.Cell(row, 6).Value = rec.Status ?? "N/A";
+                        row++;
+                    }
+
+                    using (var stream = new MemoryStream())
+                    {
+                        workbook.SaveAs(stream);
+                        var content = stream.ToArray();
+                        return File(content,
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            $"MonthlyAttendance_{month}_{year}.xlsx");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in ExportMonthlyAttendance: {ex.Message}");
+
+                TempData["ErrorMessage"] = "Failed to export attendance records.";
+                return RedirectToAction("AttendanceManagement");
+            }
+        }
+
+
+        
         public async Task<List<SelectListItem>> getUserByRoles(string roleName)
         {
             try

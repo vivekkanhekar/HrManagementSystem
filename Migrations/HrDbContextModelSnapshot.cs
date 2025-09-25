@@ -54,7 +54,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasIndex("AttendanceId");
 
-                    b.ToTable("AttendanceCorrections");
+                    b.ToTable("AttendanceCorrections", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.ActivityTasks", b =>
@@ -80,7 +80,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Activities");
+                    b.ToTable("Activities", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.AppTemplateLatest", b =>
@@ -136,7 +136,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasIndex("ManagerId");
 
-                    b.ToTable("appraisalTemplatesLatest");
+                    b.ToTable("appraisalTemplatesLatest", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.AppraisalResponse", b =>
@@ -175,7 +175,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("appraisalResponses");
+                    b.ToTable("appraisalResponses", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.AssetType", b =>
@@ -199,7 +199,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("AssetTypes");
+                    b.ToTable("AssetTypes", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.ClientLeavePolicy", b =>
@@ -230,7 +230,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasIndex("ClientID");
 
-                    b.ToTable("ClientLeavePolicies");
+                    b.ToTable("ClientLeavePolicies", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.Department", b =>
@@ -250,7 +250,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Departments");
+                    b.ToTable("Departments", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.Designation", b =>
@@ -267,7 +267,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasKey("DesignationId");
 
-                    b.ToTable("Designations");
+                    b.ToTable("Designations", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.EmployeeAsset", b =>
@@ -297,7 +297,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasIndex("EmployeeID");
 
-                    b.ToTable("EmployeeAssets");
+                    b.ToTable("EmployeeAssets", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.EmployeeAttendance", b =>
@@ -336,7 +336,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("EmployeeAttendances");
+                    b.ToTable("EmployeeAttendances", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.EmployeeClientAssignment", b =>
@@ -376,7 +376,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasIndex("ManagerId");
 
-                    b.ToTable("EmployeeClientAssignments");
+                    b.ToTable("EmployeeClientAssignments", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.EmployeeLeave", b =>
@@ -417,7 +417,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasIndex("LeaveTypeId");
 
-                    b.ToTable("EmployeeLeaves");
+                    b.ToTable("EmployeeLeaves", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.EmployeeLoan", b =>
@@ -454,7 +454,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("LoanApplication");
+                    b.ToTable("LoanApplication", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.EmployeeOffDetails", b =>
@@ -521,7 +521,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasIndex("JobTypeId");
 
-                    b.ToTable("EmployeeOffDetails");
+                    b.ToTable("EmployeeOffDetails", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.EmployeeSalary", b =>
@@ -560,7 +560,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasIndex("EmployeeID");
 
-                    b.ToTable("EmployeeSalaries");
+                    b.ToTable("EmployeeSalaries", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.JobType", b =>
@@ -577,7 +577,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasKey("JobTypeId");
 
-                    b.ToTable("JobTypes");
+                    b.ToTable("JobTypes", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.LeaveApplication", b =>
@@ -623,7 +623,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasIndex("LeaveTypeId");
 
-                    b.ToTable("LeaveApplications");
+                    b.ToTable("LeaveApplications", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.LeaveType", b =>
@@ -649,7 +649,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasKey("Leave_Id");
 
-                    b.ToTable("LeaveTypes");
+                    b.ToTable("LeaveTypes", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.Projects", b =>
@@ -672,7 +672,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasKey("ProjectId");
 
-                    b.ToTable("Project");
+                    b.ToTable("Project", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.SalaryComponent", b =>
@@ -699,7 +699,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasKey("ComponentID");
 
-                    b.ToTable("SalaryComponents");
+                    b.ToTable("SalaryComponents", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.Timesheet", b =>
@@ -756,7 +756,7 @@ namespace HrManagementSystem.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Timesheets");
+                    b.ToTable("Timesheets", (string)null);
                 });
 
             modelBuilder.Entity("HrManagementSystem.Models.User", b =>

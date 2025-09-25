@@ -789,11 +789,37 @@ namespace HrManagementSystem.Controllers
         }
 
         // Approve Leave
-        public IActionResult ApproveLeave(string id)
+        //public IActionResult ApproveLeave(string id)
+        //{
+        //    try
+        //    {
+        //        var leave = _context.LeaveApplications.FirstOrDefault(x => x.EmployeeID == id);
+        //        if (leave != null)
+        //        {
+        //            leave.Status = "Approved";
+        //            _context.LeaveApplications.Update(leave);
+        //            _context.SaveChanges();
+        //            TempData["Success"] = "Leave approved successfully.";
+        //        }
+        //        else
+        //        {
+        //            TempData["Error"] = "Leave request not found.";
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error approving leave for EmployeeID {EmployeeId}", id);
+        //        TempData["Error"] = "An error occurred while approving leave.";
+        //    }
+
+        //    return RedirectToAction("ManageLeave");
+        //}
+
+        public IActionResult ApproveLeave(int id) 
         {
             try
             {
-                var leave = _context.LeaveApplications.FirstOrDefault(x => x.EmployeeID == id);
+                var leave = _context.LeaveApplications.FirstOrDefault(x => x.Id == id);
                 if (leave != null)
                 {
                     leave.Status = "Approved";
@@ -808,19 +834,20 @@ namespace HrManagementSystem.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error approving leave for EmployeeID {EmployeeId}", id);
+                _logger.LogError(ex, "Error approving leave for LeaveId {LeaveId}", id);
                 TempData["Error"] = "An error occurred while approving leave.";
             }
 
             return RedirectToAction("ManageLeave");
         }
 
+
         // Reject Leave
-        public IActionResult RejectLeave(string id)
+        public IActionResult RejectLeave(int id)
         {
             try
             {
-                var leave = _context.LeaveApplications.FirstOrDefault(x => x.EmployeeID == id);
+                var leave = _context.LeaveApplications.FirstOrDefault(x => x.Id == id);
                 if (leave != null)
                 {
                     leave.Status = "Rejected";

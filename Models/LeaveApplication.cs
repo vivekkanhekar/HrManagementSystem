@@ -18,7 +18,7 @@ namespace HrManagementSystem.Models
         public DateTime ToDate { get; set; }
 
         public string? Reason { get; set; }
-        public string Status { get; set; }
+        public string Status { get; set; } = "Pending"; //  default value
         public string? AttachmentPath { get; set; }
 
         public DateTime SubmittedOn { get; set; } = DateTime.Now;

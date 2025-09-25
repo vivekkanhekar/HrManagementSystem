@@ -57,9 +57,16 @@
                 <td>
                     @if (leave.Status == "Pending")
                     {
-                        <button type="button" asp-action="ApproveLeave" asp-controller="Manager" asp-asp-route-id="@leave.EmpOffId">Approve</button>
-                        <a href="/Manager/ApproveLeave?id=@leave.EmpOffId" class="btn btn-success btn-sm">Approve</a>
-                        <a href="@Url.Action("RejectLeave", "Manager", new { id = leave.EmpOffId })" class="btn btn-danger btn-sm">Reject</a>
+@*                         <button type="button" asp-action="ApproveLeave" asp-controller="Manager" asp-asp-route-id="@leave.EmpOffId">Approve</button>
+@*                          <a href="@Url.Action("RejectLeave", "Manager", new { id = leave.EmpOffId })" class="btn btn-danger btn-sm">Reject</a>
+ *@
+                       @*  <a href="@Url.Action("ApproveLeave", "Manager", new { id = leave.EmpOffId })" class="btn btn-success btn-sm">Approve</a>
+
+                        <a href="@Url.Action("RejectLeave", "Manager", new { id = leave.EmpOffId })" class="btn btn-danger btn-sm">Reject</a> *@
+
+                        <a href="@Url.Action("ApproveLeave", "Manager", new { id = leave.Id })" class="btn btn-success btn-sm">Approve</a>
+                        <a href="@Url.Action("RejectLeave", "Manager", new { id = leave.Id })" class="btn btn-danger btn-sm">Reject</a>
+
                     }
                     else
                     {

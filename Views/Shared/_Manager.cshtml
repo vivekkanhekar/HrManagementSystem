@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="#">HR Management System</a>
+            <div class="d-flex">
+                <span class="text-white me-3">Welcome, Manager</span>
+                <a href=" @Url.Action("Logout", "Account")" class="btn btn-outline-light btn-sm">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 mb-3">
+                <div class="list-group shadow-sm">
+                    <a href="Index" class="list-group-item list-group-item-action active">📊 Dashboard</a>
+                    <a href="ViewTimesheets" class="list-group-item list-group-item-action">📝 Timesheets</a>
+                    <a href="AssignEmployee" class="list-group-item list-group-item-action">👥 Employees</a>
+                    <a href="ManageLeave" class="list-group-item list-group-item-action">🗓 Manage Leave</a>
+                    <a href="CreateAppraisalTemplate" class="list-group-item list-group-item-action">📄 Appraisal Template</a>
+                    <a href="ViewAppraisals" class="list-group-item list-group-item-action">⭐ View Appraisals</a>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="col-md-9 col-lg-10">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Footer -->
+    <footer class="text-center text-muted py-3 bg-white shadow-sm mt-4">
+        © 2025 - HrManagementSystem · <a href="#" class="text-decoration-none">Privacy</a>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
